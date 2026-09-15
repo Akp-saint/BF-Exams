@@ -1,0 +1,13 @@
+<%- include('partials/header') %>
+<section class="info-section container">
+  <div class="result-header"><div><div class="eyebrow">Espace candidat</div><h1>Mes dossiers</h1><p class="result-subtitle"><%= candidate.full_name || candidate.phone %></p></div><a class="outline-button" href="/inscription/deconnexion">Déconnexion</a></div>
+  <p><a class="primary-button" href="/inscription/nouveau">+ Nouveau dossier</a></p>
+  <% if (!registrations.length) { %><div class="result-card"><p>Aucun dossier n’est encore enregistré.</p></div><% } %>
+  <% registrations.forEach((registration) => { %>
+    <div class="result-card" style="margin:16px 0;display:flex;justify-content:space-between;gap:20px;align-items:center;flex-wrap:wrap;">
+      <div><strong><%= registration.registration_number %></strong><p><%= registration.exam %> · Session <%= registration.session_year %> · <%= registration.first_name %> <%= registration.last_name %></p></div>
+      <div><span class="status-badge <%= registration.status === 'Payé' ? 'is-success' : 'is-eligible' %>"><%= registration.status %></span><% if (registration.status !== 'Payé') { %> <a href="/inscription/paiement/<%= registration.id %>">Payer</a><% } else { %> <a href="/inscription/convocation/<%= registration.id %>">Confirmation</a><% } %> <a href="/inscription/documents/<%= registration.id %>">Pièces</a></div>
+    </div>
+  <% }) %>
+</section>
+<%- include('partials/footer') %>

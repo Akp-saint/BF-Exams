@@ -1,0 +1,101 @@
+<%- include('../partials/header') %>
+<section class="result-page">
+  <div class="container">
+    <div class="result-toolbar no-print">
+      <a href="/admin" class="back-link">← Retour au tableau de bord DGEC</a>
+    </div>
+
+    <div class="result-header">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> Direction Générale des Examens et Concours</div>
+        <h1>Import Massif des Résultats <span>— Fichier CSV / Excel</span></h1>
+        <p class="result-subtitle">Injectez directement les procès-verbaux de délibération des jurys dans la base nationale.</p>
+      </div>
+      <div>
+        <a href="/admin/modele-csv" class="primary-button outline-button" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px; padding:10px 16px;">
+          ⬇ Télécharger Modèle CSV Type
+        </a>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert alert-error" style="margin-bottom: 20px;">
+        <span>!</span><%= error %>
+      </div>
+    <% } %>
+
+    <% if (report) { %>
+      <div class="verification-banner is-valid" style="margin-bottom: 25px;">
+        <div class="banner-icon">✓</div>
+        <div>
+          <h2>Importation Terminée avec Succès</h2>
+          <p>
+            Total lignes traitées : <strong><%= report.total %></strong> |
+            Candidats insérés / mis à jour : <strong><%= report.inserted %></strong>
+          </p>
+          <% if (report.errors && report.errors.length > 0) { %>
+            <div style="margin-top: 10px; color:#8c2529;">
+              <strong>Avertissements (<%= report.errors.length %>) :</strong>
+              <ul>
+                <% report.errors.forEach(e => { %>
+                  <li><%= e %></li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; align-items: start;">
+      <!-- FORMULAIRE D'UPLOAD -->
+      <div class="search-card">
+        <div class="card-heading">
+          <div class="card-icon">📥</div>
+          <div>
+            <h2>Sélectionner le fichier de délibération</h2>
+            <p>Formats acceptés : <code>.csv</code> (séparateur virgule ou point-virgule)</p>
+          </div>
+        </div>
+
+        <form action="/admin/import" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <label for="csv_file">Fichier CSV des résultats <span>*</span></label>
+          <input type="file" id="csv_file" name="csv_file" accept=".csv, text/csv" required style="padding:10px; border:2px dashed #b9d6c3; height:auto; margin-bottom:15px; cursor:pointer;">
+
+          <button type="submit" class="primary-button" style="margin-top: 15px;">
+            Lancer l'importation et le calcul des moyennes <span>→</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- AIDE ET SPÉCIFICATIONS DES COLONNES -->
+      <div class="notice-card" style="background:#fff; border:1px solid #dbe5df;">
+        <strong style="font-size:14px; color:var(--green-dark);">Format de fichier attendu</strong>
+        <p style="font-size:12px; color:var(--muted); line-height:1.6; margin: 10px 0 15px;">
+          Le fichier CSV doit comporter une première ligne d'en-tête contenant les colonnes suivantes :
+        </p>
+        <ul style="font-size:11px; line-height:1.8; color:#2c3934; padding-left:18px; margin:0;">
+          <li><code>exam</code> : CEP, BEPC ou BAC</li>
+          <li><code>pv_number</code> : Ex. BAC-2026-9901</li>
+          <li><code>first_name</code> & <code>last_name</code> : Prénom et Nom</li>
+          <li><code>birth_date</code> : JJ/MM/AAAA (ex. 12/05/2007)</li>
+          <li><code>gender</code> : Masculin ou Féminin</li>
+          <li><code>center</code> & <code>jury</code> : Centre d'examen et Jury</li>
+          <li><code>series</code> : Ex. D (Scientifique), A4, G2, C...</li>
+          <li><code>round</code> : 1er tour ou 2nd tour</li>
+          <li><code>status</code> : Admis, Admissible, ou Refusé</li>
+          <li><code>mention</code> : Très Bien, Bien, Assez Bien, Passable</li>
+          <li><code>average</code> : Note moyenne sur 20</li>
+        </ul>
+        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--line);">
+          <small style="color:var(--muted);">
+            Astuce : Les codes de vérification cryptographiques pour les QR Codes sont générés automatiquement lors de l'import s'ils ne sont pas fournis !
+          </small>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<%- include('../partials/footer') %>

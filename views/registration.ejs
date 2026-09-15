@@ -1,0 +1,25 @@
+<%- include('partials/header') %>
+<section class="info-section container">
+  <div class="search-card" style="max-width:760px;margin:auto;">
+    <div class="eyebrow">Dossier d'inscription</div>
+    <h1>Inscription à un examen national</h1>
+    <% if (error) { %><div class="alert alert-error" role="alert"><%= error %></div><% } %>
+    <form method="post" action="<%= typeof csrfToken !== 'undefined' ? '/inscription/nouveau' : '/inscription/nouveau' %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label for="exam">Examen <span>*</span></label>
+      <select id="exam" name="exam" required><option value="BAC">BAC</option><option value="BEPC">BEPC</option><option value="CEP">CEP</option></select>
+      <label for="first_name">Prénoms <span>*</span></label><input id="first_name" name="first_name" required>
+      <label for="last_name">Nom <span>*</span></label><input id="last_name" name="last_name" required>
+      <label for="birth_date">Date de naissance <span>*</span></label><input id="birth_date" name="birth_date" placeholder="JJ/MM/AAAA" required>
+      <label for="birth_place">Lieu de naissance <span>*</span></label><input id="birth_place" name="birth_place" required>
+      <label for="gender">Sexe <span>*</span></label><select id="gender" name="gender" required><option>Masculin</option><option>Féminin</option></select>
+      <label for="school">Établissement</label><input id="school" name="school">
+      <label for="series">Série ou option</label><input id="series" name="series" value="Général">
+      <label for="region">Région <span>*</span></label><input id="region" name="region" value="Centre" required>
+      <label for="province">Province <span>*</span></label><input id="province" name="province" value="Kadiogo" required>
+      <label for="center">Centre souhaité <span>*</span></label><input id="center" name="center" required>
+      <button class="primary-button" type="submit">Enregistrer le dossier <span>→</span></button>
+    </form>
+  </div>
+</section>
+<%- include('partials/footer') %>

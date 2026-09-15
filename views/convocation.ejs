@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><title><%= pageTitle %></title><link rel="stylesheet" href="/css/styles.css"></head><body>
+<main class="container" style="max-width:800px;margin:40px auto;">
+  <div class="result-card">
+    <div class="eyebrow">MENAPLN · DGEC</div><h1>Confirmation d'inscription</h1>
+    <p>Ce document confirme l'enregistrement du dossier suivant dans la simulation du portail national.</p>
+    <div class="identity-grid"><div><small>N° d'inscription</small><strong><%= registration.registration_number %></strong></div><div><small>Examen</small><strong><%= registration.exam %> · Session <%= registration.session_year %></strong></div><div><small>Candidat</small><strong><%= registration.last_name %> <%= registration.first_name %></strong></div><div><small>Date de naissance</small><strong><%= registration.birth_date %></strong></div><div><small>Centre souhaité</small><strong><%= registration.center %></strong></div><div><small>Région / Province</small><strong><%= registration.region %> / <%= registration.province %></strong></div></div>
+    <p><strong>Statut :</strong> Paiement confirmé</p><p><strong>Attention :</strong> cette confirmation ne remplace pas la convocation officielle, qui sera publiée après validation DGEC du centre et de la session.</p>
+    <button class="primary-button no-print" onclick="window.print()">Imprimer</button> <a class="outline-button no-print" href="/espace-candidat">Retour</a>
+  </div>
+</main></body></html>

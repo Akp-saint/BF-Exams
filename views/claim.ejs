@@ -1,0 +1,146 @@
+<%- include('partials/header') %>
+<section class="hero" style="padding: 40px 0 60px;">
+  <div class="container">
+    <div class="result-toolbar no-print">
+      <a href="/" class="back-link">← Retour au portail</a>
+    </div>
+
+    <div class="hero-copy" style="max-width: 800px; margin-bottom: 30px;">
+      <div class="eyebrow"><span class="eyebrow-line"></span> Commission des Recours & Réclamations</div>
+      <h1 style="font-size: clamp(28px, 4vw, 42px); margin: 15px 0 10px;">Réclamations en Ligne <em>DGEC</em></h1>
+      <p class="hero-intro">Les candidats disposent d’un délai légal pour soumettre une requête relative à une erreur de saisie matérielle de note, d’omission ou d’anomalie d’état civil.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 30px; align-items: start;">
+      
+      <!-- 1. FORMULAIRE DE DÉPÔT DE RÉCLAMATION -->
+      <div class="search-card">
+        <div class="card-heading">
+          <div class="card-icon">✉</div>
+          <div>
+            <h2>Déposer une nouvelle réclamation</h2>
+            <p>Veuillez fournir des informations précises et vérifiables.</p>
+          </div>
+        </div>
+
+        <% if (error) { %>
+          <div class="alert alert-error" role="alert"><span>!</span><%= error %></div>
+        <% } %>
+        <% if (successMessage) { %>
+          <div class="verification-banner is-valid" style="padding: 12px 16px; margin-bottom: 20px;">
+            <div class="banner-icon">✓</div>
+            <div>
+              <strong style="font-size:13px;"><%= successMessage %></strong>
+              <% if (newClaimNumber) { %>
+                <p>Votre numéro de dossier : <code style="font-size:14px; font-weight:bold; color:var(--green);"><%= newClaimNumber %></code></p>
+              <% } %>
+            </div>
+          </div>
+        <% } %>
+
+        <form action="/reclamation" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+              <label for="exam">Examen concerné <span>*</span></label>
+              <select id="exam" name="exam" required>
+                <option value="BAC" <%= defaultExam === 'BAC' ? 'selected' : '' %>>BAC — Baccalauréat</option>
+                <option value="BEPC" <%= defaultExam === 'BEPC' ? 'selected' : '' %>>BEPC — Brevet</option>
+                <option value="CEP" <%= defaultExam === 'CEP' ? 'selected' : '' %>>CEP — Certificat primaire</option>
+              </select>
+            </div>
+            <div>
+              <label for="pv_number">Numéro de PV <span>*</span></label>
+              <input type="text" id="pv_number" name="pv_number" value="<%= defaultPv || '' %>" placeholder="Ex. BAC-2026-0837" required>
+            </div>
+          </div>
+
+          <label for="candidate_name">Nom et Prénoms du candidat <span>*</span></label>
+          <input type="text" id="candidate_name" name="candidate_name" placeholder="Ex. Salimata TRAORÉ" required>
+
+          <label for="claim_type">Motif de la réclamation <span>*</span></label>
+          <select id="claim_type" name="claim_type" required>
+            <option value="Erreur de saisie note">Erreur de saisie matérielle de note</option>
+            <option value="Erreur état civil">Erreur sur l’état civil (Nom, Date ou Lieu de naissance)</option>
+            <option value="Omission">Omission de note ou d'épreuve facultative</option>
+            <option value="Autre">Autre anomalie constatée</option>
+          </select>
+
+          <label for="description">Description détaillée du problème <span>*</span></label>
+          <textarea id="description" name="description" rows="4" style="width:100%; border:1px solid #d7e1dc; border-radius:6px; padding:10px; font-family:inherit; font-size:12px;" placeholder="Précisez la matière concernée, la note attendue et toute référence utile..." required></textarea>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 5px;">
+            <div>
+              <label for="phone">Téléphone (SMS) <span>*</span></label>
+              <input type="tel" id="phone" name="phone" placeholder="Ex. +226 70 00 00 00" required>
+            </div>
+            <div>
+              <label for="email">Email (optionnel)</label>
+              <input type="email" id="email" name="email" placeholder="candidat@email.bf">
+            </div>
+          </div>
+
+          <button type="submit" class="primary-button" style="margin-top: 20px;">
+            Soumettre ma réclamation <span>→</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- 2. SUIVI D'UN DOSSIER DE RÉCLAMATION EXISTANT -->
+      <div>
+        <div class="search-card" style="margin-bottom: 25px;">
+          <div class="card-heading">
+            <div class="card-icon">🔎</div>
+            <div>
+              <h2>Suivre un dossier existant</h2>
+              <p>Consultez l’état d'avancement de votre requête.</p>
+            </div>
+          </div>
+
+          <form action="/reclamation/suivi" method="get">
+            <label for="claim_number">Numéro de dossier</label>
+            <input type="text" id="claim_number" name="claim_number" value="<%= queryClaimNumber || '' %>" placeholder="Ex. REC-2026-0001" required>
+            <button type="submit" class="primary-button" style="margin-top: 15px;">Consulter le statut <span>→</span></button>
+          </form>
+        </div>
+
+        <% if (trackedClaim) { %>
+          <div class="result-card" style="border-top: 4px solid var(--green);">
+            <div class="section-title">
+              <span class="section-number">📂</span>
+              <h2 style="font-size:14px;">Dossier : <%= trackedClaim.claim_number %></h2>
+            </div>
+            <div style="font-size: 12px; line-height: 1.8;">
+              <div><strong>Candidat :</strong> <%= trackedClaim.candidate_name %> (PV : <%= trackedClaim.pv_number %>)</div>
+              <div><strong>Examen :</strong> <%= trackedClaim.exam %></div>
+              <div><strong>Objet :</strong> <%= trackedClaim.claim_type %></div>
+              <div><strong>Date de dépôt :</strong> <%= trackedClaim.created_at %></div>
+              <div style="margin-top: 10px;">
+                <strong>Statut du traitement :</strong><br>
+                <span class="status-badge <%= trackedClaim.status === 'Approuvée' ? 'is-success' : (trackedClaim.status === 'Rejetée' ? 'is-failed' : 'is-eligible') %>" style="display:inline-flex; padding: 4px 10px; margin-top: 4px;">
+                  <%= trackedClaim.status %>
+                </span>
+              </div>
+              <% if (trackedClaim.admin_notes) { %>
+                <div style="margin-top: 12px; padding: 10px; background: #f5f8f6; border-radius: 6px; border-left: 3px solid var(--green);">
+                  <strong>Réponse de la commission :</strong><br>
+                  <span style="color:#2c3934;"><%= trackedClaim.admin_notes %></span>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        <% } else if (trackedNotFound) { %>
+          <div class="alert alert-error">Dossier introuvable. Vérifiez le numéro de dossier saisi.</div>
+        <% } %>
+
+        <div class="notice-card" style="margin-top: 20px;">
+          <strong>Délai réglementaire</strong>
+          <p>Toutes les réclamations font l’objet d’une vérification sur bordereau original de jury sous 72 heures ouvrées.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<%- include('partials/footer') %>

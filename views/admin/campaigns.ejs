@@ -1,0 +1,8 @@
+<%- include('../partials/header') %>
+<section class="info-section container">
+  <div class="result-header"><div><div class="eyebrow">Administration DGEC</div><h1>Campagnes d'inscription</h1><p class="result-subtitle">Ouvrir, suspendre ou clôturer les inscriptions par examen et session.</p></div><a class="outline-button" href="/admin">Retour</a></div>
+  <div class="result-card"><div class="table-wrap"><table><thead><tr><th>Campagne</th><th>Examen</th><th>Frais</th><th>Ouverture</th><th>Clôture</th><th>Statut</th><th>Action</th></tr></thead><tbody>
+  <% campaigns.forEach(campaign => { %><tr><td><strong><%= campaign.label %></strong></td><td><%= campaign.exam %> <%= campaign.session_year %></td><td><%= campaign.fee %> FCFA</td><td><%= campaign.opens_at %></td><td><%= campaign.closes_at %></td><td><span class="status-badge <%= campaign.status === 'Ouverte' ? 'is-success' : 'is-eligible' %>"><%= campaign.status %></span></td><td><form method="post" action="/admin/campagnes/<%= campaign.id %>/statut"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><select name="status"><option>Brouillon</option><option>Ouverte</option><option>Suspendue</option><option>Clôturée</option></select><button class="outline-button" type="submit">Appliquer</button></form></td></tr><% }) %>
+  </tbody></table></div></div>
+</section>
+<%- include('../partials/footer') %>

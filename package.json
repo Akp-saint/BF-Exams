@@ -1,0 +1,31 @@
+{
+  "name": "portail-resultats-burkina-faso",
+  "version": "1.0.0",
+  "description": "Portail de consultation des résultats des examens nationaux du Burkina Faso",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "test": "node --test",
+    "db:migrate": "node scripts/migrate.js",
+    "admin:create": "node scripts/create-admin.js",
+    "load:test": "node scripts/load.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "connect-redis": "^10.0.0",
+    "cookie-parser": "^1.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.19.0",
+    "helmet": "^8.0.0",
+    "multer": "^2.3.0",
+    "pdfkit": "^0.20.2",
+    "pg": "^8.23.0",
+    "qrcode": "^1.5.4",
+    "redis": "^6.2.1"
+  }
+}

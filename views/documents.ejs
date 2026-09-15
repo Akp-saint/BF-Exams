@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+<section class="info-section container">
+  <div class="search-card" style="max-width:700px;margin:auto;">
+    <div class="eyebrow">Dossier <%= registration.registration_number %></div>
+    <h1>Pièces justificatives</h1>
+    <p class="field-help">Formats acceptés : PDF, JPG ou PNG. Taille maximale : 5 Mo par fichier.</p>
+    <% if (error) { %><div class="alert alert-error" role="alert"><%= error %></div><% } %>
+    <form method="post" enctype="multipart/form-data" action="/inscription/documents/<%= registration.id %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label for="document_type">Type de document <span>*</span></label>
+      <select id="document_type" name="document_type" required><option>Acte de naissance</option><option>Certificat de nationalité</option><option>Photo d'identité</option><option>Justificatif scolaire</option><option>Autre</option></select>
+      <label for="document">Fichier <span>*</span></label>
+      <input id="document" name="document" type="file" accept="application/pdf,image/jpeg,image/png" required>
+      <button class="primary-button" type="submit">Déposer la pièce <span>→</span></button>
+    </form>
+    <h2>Pièces déposées</h2>
+    <% if (!documents.length) { %><p>Aucune pièce déposée.</p><% } else { %>
+      <ul><% documents.forEach(document => { %><li><strong><%= document.document_type %></strong> · <%= document.original_name %> · <%= document.status %></li><% }) %></ul>
+    <% } %>
+    <p><a href="/espace-candidat">Retour à mon espace</a></p>
+  </div>
+</section>
+<%- include('partials/footer') %>

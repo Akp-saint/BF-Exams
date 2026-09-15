@@ -1,0 +1,112 @@
+<%- include('../partials/header') %>
+<section class="result-page">
+  <div class="container">
+    <div class="result-toolbar no-print">
+      <a href="/" class="back-link">← Retour au portail public</a>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span style="font-size: 12px; color: var(--muted);">Connecté en tant que : <strong><%= currentUser.full_name %></strong></span>
+        <a href="/admin/logout" class="outline-button" style="text-decoration:none; padding:6px 12px; font-size:11px; color:#b32025; border-color:#f1cdcf;">
+          Déconnexion
+        </a>
+      </div>
+    </div>
+
+    <div class="result-header">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> Direction Générale des Examens et Concours</div>
+        <h1>Tableau de Bord DGEC <span>— Session 2026</span></h1>
+        <p class="result-subtitle">Supervision nationale des résultats, proclamation des jurys et traitement des réclamations.</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a href="/admin/import" class="primary-button" style="padding:10px 18px; text-decoration:none; display:inline-flex; align-items:center;">
+          📥 Importer CSV / Excel
+        </a>
+      </div>
+    </div>
+
+    <!-- 1. NAVIGATION BACK-OFFICE -->
+    <div style="display: flex; gap: 12px; margin-bottom: 25px; flex-wrap: wrap;">
+      <a href="/admin/jurys" class="outline-button" style="display:inline-flex; align-items:center; gap:6px; background:#fff; text-decoration:none;">
+        🏛 Proclamation des Jurys (<%= juries.length %>)
+      </a>
+      <a href="/admin/reclamations" class="outline-button" style="display:inline-flex; align-items:center; gap:6px; background:#fff; text-decoration:none; <%= pendingClaimsCount > 0 ? 'border-color:#e5b52d; color:#8c5b00;' : '' %>">
+        ✉ Traitement des Réclamations (<%= pendingClaimsCount %> en attente)
+      </a>
+      <a href="/admin/import" class="outline-button" style="display:inline-flex; align-items:center; gap:6px; background:#fff; text-decoration:none;">
+        📊 Import Massif de Données
+      </a>
+      <a href="/admin/campagnes" class="outline-button" style="display:inline-flex; align-items:center; gap:6px; background:#fff; text-decoration:none;">
+        🗓 Campagnes d'inscription
+      </a>
+      <a href="/statistiques" target="_blank" class="outline-button" style="display:inline-flex; align-items:center; gap:6px; background:#fff; text-decoration:none;">
+        🔍 Voir Statistiques Publiques ↗
+      </a>
+    </div>
+
+    <!-- 2. CARTES D'INDICATEURS NATIONAUX -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;">
+      <div class="result-card" style="padding: 20px;">
+        <small style="color:var(--muted); font-size:11px; text-transform:uppercase; font-weight:bold;">Total Candidats</small>
+        <div style="font-size: 32px; font-weight: bold; color: var(--green); margin-top: 5px;"><%= stats.global.total || 0 %></div>
+      </div>
+      <div class="result-card" style="padding: 20px;">
+        <small style="color:var(--muted); font-size:11px; text-transform:uppercase; font-weight:bold;">Admis Définitivement</small>
+        <div style="font-size: 32px; font-weight: bold; color: #006b3f; margin-top: 5px;"><%= stats.global.admitted || 0 %></div>
+      </div>
+      <div class="result-card" style="padding: 20px;">
+        <small style="color:var(--muted); font-size:11px; text-transform:uppercase; font-weight:bold;">Admissibles (2nd Tour)</small>
+        <div style="font-size: 32px; font-weight: bold; color: #a7670e; margin-top: 5px;"><%= stats.global.eligible || 0 %></div>
+      </div>
+      <div class="result-card" style="padding: 20px;">
+        <small style="color:var(--muted); font-size:11px; text-transform:uppercase; font-weight:bold;">Taux Réussite National</small>
+        <div style="font-size: 32px; font-weight: bold; color: var(--green); margin-top: 5px;"><%= stats.global.successRate %>%</div>
+      </div>
+    </div>
+
+    <!-- 3. ÉTAT DES JURYS -->
+    <section class="result-card" style="margin-bottom: 25px;">
+      <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="section-number">01</span>
+          <h2>Aperçu des Jurys de Délibération</h2>
+        </div>
+        <a href="/admin/jurys" style="color:var(--green); font-size:12px; font-weight:bold; text-decoration:underline;">Gérer tous les jurys →</a>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code Jury</th>
+              <th>Nom du Jury</th>
+              <th>Examen</th>
+              <th>Centre d'examen</th>
+              <th>Région</th>
+              <th class="numeric">Candidats</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% juries.slice(0, 5).forEach(j => { %>
+              <tr>
+                <td><code><%= j.code %></code></td>
+                <td><strong><%= j.name %></strong></td>
+                <td><span style="font-weight:bold;"><%= j.exam %></span></td>
+                <td><%= j.center %></td>
+                <td><%= j.region %> (<%= j.province %>)</td>
+                <td class="numeric"><strong><%= j.candidate_count %></strong></td>
+                <td>
+                  <span class="status-badge <%= j.status === 'Proclamé' ? 'is-success' : 'is-failed' %>" style="display:inline-flex; padding:3px 8px; font-size:10px;">
+                    <%= j.status %>
+                  </span>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,3 @@
+<%- include('partials/header') %>
+<section class="error-page container"><div class="error-symbol">!</div><div class="eyebrow">Service de consultation</div><h1><%= typeof notFound !== 'undefined' && notFound ? 'Page introuvable' : 'Une erreur est survenue' %></h1><p><%= typeof message !== 'undefined' && message ? message : (typeof notFound !== 'undefined' && notFound ? 'La page demandée n’existe pas ou n’est plus disponible.' : 'Le service rencontre momentanément une difficulté. Veuillez réessayer dans quelques instants.') %></p><a href="/" class="primary-button inline-button">Retour à l’accueil <span>→</span></a></section>
+<%- include('partials/footer') %>

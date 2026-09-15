@@ -1,0 +1,39 @@
+<%- include('../partials/header') %>
+<section class="hero" style="padding: 60px 0;">
+  <div class="container" style="max-width: 480px;">
+    <div class="search-card">
+      <div class="card-heading">
+        <div class="card-icon" style="background:#eaf2ec; color:var(--green);">🔒</div>
+        <div>
+          <h2>Espace DGEC & Jurys</h2>
+          <p>Authentification des agents et présidents de jurys.</p>
+        </div>
+      </div>
+
+      <% if (error) { %>
+        <div class="alert alert-error" role="alert" style="margin-bottom: 20px;">
+          <span>!</span><%= error %>
+        </div>
+      <% } %>
+
+      <form action="/admin/login" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label for="identifier">Identifiant ou Email <span>*</span></label>
+        <input type="text" id="identifier" name="identifier" value="<%= identifier || '' %>" placeholder="identifiant ou adresse email" required autocomplete="username">
+
+        <label for="password">Mot de passe sécurisé <span>*</span></label>
+        <input type="password" id="password" name="password" placeholder="••••••••••••" required autocomplete="current-password">
+
+        <button type="submit" class="primary-button" style="margin-top: 25px;">
+          Se connecter à l'espace DGEC <span>→</span>
+        </button>
+      </form>
+
+      <div class="demo-note" style="margin-top: 25px;">
+        Les comptes d'accès sont provisionnés explicitement par l'équipe
+        d'exploitation avec <code>npm run admin:create</code>.
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,89 @@
+<%- include('../partials/header') %>
+<section class="result-page">
+  <div class="container">
+    <div class="result-toolbar no-print">
+      <a href="/admin" class="back-link">← Retour au tableau de bord DGEC</a>
+    </div>
+
+    <div class="result-header">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> Gestion des Délibérations</div>
+        <h1>Jurys d'Examen & Proclamations <span>— Session 2026</span></h1>
+        <p class="result-subtitle">Contrôle de la publication officielle des résultats par centre et jury.</p>
+      </div>
+    </div>
+
+    <% if (successMessage) { %>
+      <div class="verification-banner is-valid" style="padding: 12px 18px; margin-bottom: 20px;">
+        <div class="banner-icon">✓</div>
+        <div><strong><%= successMessage %></strong></div>
+      </div>
+    <% } %>
+
+    <section class="result-card">
+      <div class="section-title">
+        <span class="section-number">🏛</span>
+        <h2>Liste des Jurys Nationaux</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code Jury</th>
+              <th>Nom & Président</th>
+              <th>Examen</th>
+              <th>Centre d'examen</th>
+              <th>Localisation</th>
+              <th class="numeric">Candidats</th>
+              <th class="numeric">Admis</th>
+              <th>Statut de Proclamation</th>
+              <th class="numeric">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% juries.forEach(j => { %>
+              <tr>
+                <td><code><%= j.code %></code></td>
+                <td>
+                  <strong><%= j.name %></strong>
+                  <% if (j.president_name) { %>
+                    <small style="display:block; color:var(--muted);"><%= j.president_name %></small>
+                  <% } %>
+                </td>
+                <td><strong><%= j.exam %></strong></td>
+                <td><%= j.center %></td>
+                <td><%= j.region %> · <%= j.province %></td>
+                <td class="numeric"><strong><%= j.candidate_count %></strong></td>
+                <td class="numeric" style="color:#006b3f;"><strong><%= j.admitted_count %></strong></td>
+                <td>
+                  <span class="status-badge <%= j.status === 'Proclamé' ? 'is-success' : 'is-failed' %>" style="display:inline-flex; padding:3px 8px; font-size:11px;">
+                    <%= j.status %>
+                  </span>
+                </td>
+                <td class="numeric">
+                  <form action="/admin/jurys/<%= j.id %>/status" method="post" style="display:inline;">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <% if (j.status === 'Proclamé') { %>
+                      <input type="hidden" name="status" value="Brouillon">
+                      <button type="submit" class="outline-button" style="padding:4px 8px; font-size:10px; color:#b32025; border-color:#f1cdcf;">
+                        Dépublier
+                      </button>
+                    <% } else { %>
+                      <input type="hidden" name="status" value="Proclamé">
+                      <button type="submit" class="primary-button" style="padding:4px 8px; font-size:10px; min-height:auto;">
+                        Proclamer
+                      </button>
+                    <% } %>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,108 @@
+<%- include('../partials/header') %>
+<section class="result-page">
+  <div class="container">
+    <div class="result-toolbar no-print">
+      <a href="/admin" class="back-link">← Retour au tableau de bord DGEC</a>
+    </div>
+
+    <div class="result-header">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> Commission de Recours</div>
+        <h1>Traitement des Réclamations <span>— Session 2026</span></h1>
+        <p class="result-subtitle">Instruction des requêtes relatives aux erreurs matérielles de notes et d'état civil.</p>
+      </div>
+    </div>
+
+    <% if (successMessage) { %>
+      <div class="verification-banner is-valid" style="padding: 12px 18px; margin-bottom: 20px;">
+        <div class="banner-icon">✓</div>
+        <div><strong><%= successMessage %></strong></div>
+      </div>
+    <% } %>
+
+    <!-- FILTRES PAR STATUT -->
+    <div style="display:flex; gap:10px; margin-bottom: 20px; flex-wrap:wrap;">
+      <a href="/admin/reclamations" class="outline-button <%= !currentFilter ? 'is-active' : '' %>" style="font-size:11px; padding:6px 14px; text-decoration:none;">
+        Toutes (<%= claims.length %>)
+      </a>
+      <a href="/admin/reclamations?status=En+attente" class="outline-button <%= currentFilter === 'En attente' ? 'is-active' : '' %>" style="font-size:11px; padding:6px 14px; text-decoration:none; color:#a7670e;">
+        En attente
+      </a>
+      <a href="/admin/reclamations?status=En+cours" class="outline-button <%= currentFilter === 'En cours' ? 'is-active' : '' %>" style="font-size:11px; padding:6px 14px; text-decoration:none; color:var(--green);">
+        En cours d'examen
+      </a>
+      <a href="/admin/reclamations?status=Approuvée" class="outline-button <%= currentFilter === 'Approuvée' ? 'is-active' : '' %>" style="font-size:11px; padding:6px 14px; text-decoration:none; color:#006b3f;">
+        Approuvées
+      </a>
+      <a href="/admin/reclamations?status=Rejetée" class="outline-button <%= currentFilter === 'Rejetée' ? 'is-active' : '' %>" style="font-size:11px; padding:6px 14px; text-decoration:none; color:#b32025;">
+        Rejetées
+      </a>
+    </div>
+
+    <section class="result-card">
+      <div class="section-title">
+        <span class="section-number">✉</span>
+        <h2>Dossiers Enregistrés (<%= claims.length %>)</h2>
+      </div>
+
+      <% if (claims.length === 0) { %>
+        <p style="text-align:center; color:var(--muted); padding:30px;">Aucune réclamation trouvée pour ce filtre.</p>
+      <% } else { %>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>N° Dossier</th>
+                <th>Candidat / PV</th>
+                <th>Examen</th>
+                <th>Motif</th>
+                <th>Détails & Contact</th>
+                <th>Statut Actuel</th>
+                <th style="min-width:250px;">Instruction Administrative</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% claims.forEach(c => { %>
+                <tr>
+                  <td><code><%= c.claim_number %></code><br><small style="color:var(--muted);"><%= c.created_at %></small></td>
+                  <td>
+                    <strong><%= c.candidate_name %></strong><br>
+                    <small>PV : <code><%= c.pv_number %></code></small>
+                  </td>
+                  <td><strong><%= c.exam %></strong></td>
+                  <td><strong><%= c.claim_type %></strong></td>
+                  <td>
+                    <p style="margin:0 0 5px; font-size:11px; max-width:260px;"><%= c.description %></p>
+                    <small style="color:var(--muted);">Tél : <%= c.phone %></small>
+                  </td>
+                  <td>
+                    <span class="status-badge <%= c.status === 'Approuvée' ? 'is-success' : (c.status === 'Rejetée' ? 'is-failed' : 'is-eligible') %>" style="display:inline-flex; padding:3px 8px; font-size:10px;">
+                      <%= c.status %>
+                    </span>
+                  </td>
+                  <td>
+                    <form action="/admin/reclamations/<%= c.id %>" method="post">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <select name="status" style="height:32px; font-size:11px; padding:0 8px; margin-bottom:6px;">
+                        <option value="En attente" <%= c.status === 'En attente' ? 'selected' : '' %>>En attente</option>
+                        <option value="En cours" <%= c.status === 'En cours' ? 'selected' : '' %>>En cours</option>
+                        <option value="Approuvée" <%= c.status === 'Approuvée' ? 'selected' : '' %>>Approuvée (Rectifiée)</option>
+                        <option value="Rejetée" <%= c.status === 'Rejetée' ? 'selected' : '' %>>Rejetée (Non fondée)</option>
+                      </select>
+                      <input type="text" name="admin_notes" value="<%= c.admin_notes || '' %>" placeholder="Avis/réponse officielle..." style="height:32px; font-size:11px; padding:0 8px; margin-bottom:6px;">
+                      <button type="submit" class="primary-button small-button" style="min-height:28px; padding:0 10px; font-size:10px;">
+                        Enregistrer décision
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+
+  </div>
+</section>
+<%- include('../partials/footer') %>

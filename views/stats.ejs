@@ -1,0 +1,169 @@
+<%- include('partials/header') %>
+<section class="result-page">
+  <div class="container">
+    <div class="result-toolbar no-print">
+      <a href="/" class="back-link">← Retour au portail</a>
+      <button type="button" class="outline-button" onclick="window.print()">▣ Imprimer le rapport</button>
+    </div>
+
+    <div class="result-header">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> Ministère de l'Éducation Nationale · DGEC</div>
+        <h1>Statistiques Nationales <span>— Session 2026</span></h1>
+        <p class="result-subtitle">Indicateurs officiels de performance scolaire et taux de réussite nationaux.</p>
+      </div>
+      <div class="status-badge is-success">
+        <span class="status-dot"></span> Données consolidées
+      </div>
+    </div>
+
+    <!-- 1. GRILLE DES KPI GLOBAUX -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;">
+      <div class="result-card" style="text-align: center; padding: 20px;">
+        <small style="color:var(--muted); font-size:11px; text-transform:uppercase; font-weight:bold;">Total Candidats</small>
+        <div style="font-size: 32px; font-weight: bold; color: var(--green); margin-top: 5px;"><%= stats.global.total || 0 %></div>
+      </div>
+      <div class="result-card" style="text-align: center; padding: 20px;">
+        <small style="color:var(--muted); font-size:11px; text-transform:uppercase; font-weight:bold;">Admis Définitivement</small>
+        <div style="font-size: 32px; font-weight: bold; color: #006b3f; margin-top: 5px;"><%= stats.global.admitted || 0 %></div>
+      </div>
+      <div class="result-card" style="text-align: center; padding: 20px;">
+        <small style="color:var(--muted); font-size:11px; text-transform:uppercase; font-weight:bold;">Admissibles (2nd tour)</small>
+        <div style="font-size: 32px; font-weight: bold; color: #a7670e; margin-top: 5px;"><%= stats.global.eligible || 0 %></div>
+      </div>
+      <div class="result-card" style="text-align: center; padding: 20px;">
+        <small style="color:var(--muted); font-size:11px; text-transform:uppercase; font-weight:bold;">Taux de Réussite</small>
+        <div style="font-size: 32px; font-weight: bold; color: var(--green); margin-top: 5px;"><%= stats.global.successRate %>%</div>
+      </div>
+    </div>
+
+    <!-- 2. TABLEAU PAR EXAMEN -->
+    <section class="result-card" style="margin-bottom: 25px;">
+      <div class="section-title">
+        <span class="section-number">01</span>
+        <h2>Performances par Examen National (CEP, BEPC, BAC)</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Examen</th>
+              <th class="numeric">Inscrits</th>
+              <th class="numeric">Admis</th>
+              <th class="numeric">2nd Tour</th>
+              <th class="numeric">Ajournés</th>
+              <th class="numeric">Moyenne (/20)</th>
+              <th class="numeric">Taux de succès</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% stats.byExam.forEach((item) => { %>
+              <tr>
+                <td><strong><%= item.exam %></strong></td>
+                <td class="numeric"><%= item.total %></td>
+                <td class="numeric" style="color: #006b3f; font-weight: bold;"><%= item.admitted %></td>
+                <td class="numeric" style="color: #a7670e;"><%= item.eligible %></td>
+                <td class="numeric" style="color: #b32025;"><%= item.failed %></td>
+                <td class="numeric"><%= formatScore(item.average_score) %></td>
+                <td class="numeric"><strong><%= item.rate %>%</strong></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. TABLEAU PAR SÉRIE DU BACCALAURÉAT -->
+    <section class="result-card" style="margin-bottom: 25px;">
+      <div class="section-title">
+        <span class="section-number">02</span>
+        <h2>Performances par Série — Baccalauréat</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Série</th>
+              <th class="numeric">Candidats</th>
+              <th class="numeric">Admis 1er Tour</th>
+              <th class="numeric">Admissibles (2nd tour)</th>
+              <th class="numeric">Refusés</th>
+              <th class="numeric">Moyenne Série</th>
+              <th class="numeric">Taux de succès</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% stats.bySeries.forEach((item) => { %>
+              <tr>
+                <td><strong>Série <%= item.series %></strong></td>
+                <td class="numeric"><%= item.total %></td>
+                <td class="numeric" style="color:#006b3f; font-weight:bold;"><%= item.admitted %></td>
+                <td class="numeric" style="color:#a7670e;"><%= item.eligible %></td>
+                <td class="numeric" style="color:#b32025;"><%= item.failed %></td>
+                <td class="numeric"><%= formatScore(item.avg_score) %></td>
+                <td class="numeric"><strong><%= item.rate %>%</strong></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. REPARTITION PAR RÉGION & GENRE -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <section class="result-card">
+        <div class="section-title"><span class="section-number">03</span><h2>Résultats par Région</h2></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Région</th>
+                <th class="numeric">Candidats</th>
+                <th class="numeric">Admis</th>
+                <th class="numeric">Taux</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% stats.byRegion.forEach((reg) => { %>
+                <tr>
+                  <td><%= reg.region %></td>
+                  <td class="numeric"><%= reg.total %></td>
+                  <td class="numeric"><%= reg.admitted %></td>
+                  <td class="numeric"><strong><%= reg.rate %>%</strong></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="result-card">
+        <div class="section-title"><span class="section-number">04</span><h2>Répartition par Genre</h2></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Genre</th>
+                <th class="numeric">Candidats</th>
+                <th class="numeric">Admis</th>
+                <th class="numeric">Taux</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% stats.byGender.forEach((gen) => { %>
+                <tr>
+                  <td><strong><%= gen.gender %></strong></td>
+                  <td class="numeric"><%= gen.total %></td>
+                  <td class="numeric"><%= gen.admitted %></td>
+                  <td class="numeric"><strong><%= gen.rate %>%</strong></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</section>
+<%- include('partials/footer') %>

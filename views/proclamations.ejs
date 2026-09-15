@@ -1,0 +1,81 @@
+<%- include('partials/header') %>
+<section class="result-page">
+  <div class="container">
+    <div class="result-toolbar no-print">
+      <a href="/" class="back-link">← Retour au portail</a>
+      <button type="button" class="outline-button" onclick="window.print()">▣ Imprimer la liste</button>
+    </div>
+
+    <div class="result-header">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> Affichage officiel des résultats</div>
+        <h1>Listes de Proclamation par Jury <span>— Session 2026</span></h1>
+        <p class="result-subtitle">Consultation publique des jurys proclamés. Les résultats individuels restent protégés.</p>
+      </div>
+    </div>
+
+    <!-- FILTRES DE PROCLAMATION -->
+    <div class="search-card no-print" style="margin-bottom: 25px;">
+      <form action="/proclamations" method="get" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 180px;">
+          <label for="exam" style="margin-top:0;">Examen</label>
+          <select id="exam" name="exam" onchange="this.form.submit()">
+            <option value="">Tous les examens</option>
+            <option value="BAC" <%= selectedExam === 'BAC' ? 'selected' : '' %>>BAC — Baccalauréat</option>
+            <option value="BEPC" <%= selectedExam === 'BEPC' ? 'selected' : '' %>>BEPC — Brevet d'études</option>
+            <option value="CEP" <%= selectedExam === 'CEP' ? 'selected' : '' %>>CEP — Certificat primaire</option>
+          </select>
+        </div>
+
+        <div style="flex: 2; min-width: 260px;">
+          <label for="jury" style="margin-top:0;">Jury de composition</label>
+          <select id="jury" name="jury" onchange="this.form.submit()">
+            <option value="">Tous les jurys proclamés</option>
+            <% (juries || []).forEach(j => { %>
+              <option value="<%= j.name %>" <%= selectedJury === j.name ? 'selected' : '' %>>
+                <%= j.name %> — <%= j.center %> (<%= j.candidate_count %> candidats)
+              </option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div>
+          <button type="submit" class="primary-button" style="height: 48px; padding: 0 20px;">Filtrer</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Aucun résultat nominatif n'est exposé publiquement. -->
+    <section class="result-card">
+      <div class="section-title">
+        <span class="section-number">📋</span>
+        <h2>
+          Jurys proclamés (<%= juries.length %>)
+        </h2>
+      </div>
+
+      <% if (juries.length === 0) { %>
+        <p style="text-align:center; color:var(--muted); padding: 30px;">Aucun jury proclamé trouvé pour ces critères.</p>
+      <% } else { %>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Examen</th><th>Jury</th><th>Centre</th><th>Région</th><th class="numeric">Candidats</th><th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% juries.forEach(j => { %>
+                <tr>
+                  <td><strong><%= j.exam %></strong></td><td><%= j.name %></td><td><%= j.center %></td><td><%= j.region %> (<%= j.province %>)</td><td class="numeric"><%= j.candidate_count %></td><td><span class="status-badge is-success"><%= j.status %></span></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+
+  </div>
+</section>
+<%- include('partials/footer') %>

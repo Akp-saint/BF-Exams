@@ -1,0 +1,127 @@
+<%- include('partials/header') %>
+<section class="result-page">
+  <div class="container">
+    <div class="result-toolbar no-print">
+      <a href="/" class="back-link">← Nouvelle recherche</a>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a href="/resultats/<%= candidate.pv_number %>/pdf" class="primary-button outline-button" style="display:inline-flex; align-items:center; text-decoration:none; padding:10px 16px;">
+          ⬇ Télécharger Relevé PDF Officiel
+        </a>
+        <button type="button" class="outline-button" onclick="window.print()">▣ Imprimer</button>
+      </div>
+    </div>
+
+    <div class="result-header">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> Résultat officiel certifié DGEC</div>
+        <h1><%= candidate.exam %> <span>— Session <%= candidate.session_year %></span></h1>
+        <p class="result-subtitle">
+          Relevé individuel de notes · N° PV <strong><%= candidate.pv_number %></strong>
+          <% if (candidate.series && candidate.series !== 'Général') { %>
+            · Série <strong><%= candidate.series %></strong>
+          <% } %>
+          · Tour <strong><%= candidate.round %></strong>
+        </p>
+      </div>
+      <div class="status-badge <%= candidate.status === 'Admis' ? 'is-success' : (candidate.status === 'Admissible' ? 'is-eligible' : 'is-failed') %>">
+        <span class="status-dot"></span><%= candidate.status %>
+      </div>
+    </div>
+
+    <div class="result-layout">
+      <div class="result-main">
+        <!-- 01. État Civil -->
+        <section class="result-card identity-card">
+          <div class="section-title"><span class="section-number">01</span><h2>État civil du candidat</h2></div>
+          <div class="identity-grid">
+            <div><small>Nom et prénoms</small><strong><%= candidate.last_name %> <%= candidate.first_name %></strong></div>
+            <div><small>Date et lieu de naissance</small><strong><%= candidate.birth_date %> · <%= candidate.birth_place %></strong></div>
+            <div><small>Genre</small><strong><%= candidate.gender %></strong></div>
+            <div><small>Numéro de PV</small><strong><%= candidate.pv_number %></strong></div>
+          </div>
+        </section>
+
+        <!-- 02. Délibération -->
+        <section class="result-card">
+          <div class="section-title"><span class="section-number">02</span><h2>Détails de la délibération</h2></div>
+          <div class="composition-grid">
+            <div><small>Centre de composition</small><strong><%= candidate.center %></strong></div>
+            <div><small>Jury & Région</small><strong><%= candidate.jury %> (<%= candidate.region %> - <%= candidate.province %>)</strong></div>
+          </div>
+        </section>
+
+        <!-- 03. Notes -->
+        <section class="result-card grades-card">
+          <div class="section-title"><span class="section-number">03</span><h2>Notes obtenues par matière</h2></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Matière</th>
+                  <th class="numeric">Note / 20</th>
+                  <th class="numeric">Coefficient</th>
+                  <th class="numeric">Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% candidate.grades.forEach((grade) => { %>
+                  <tr>
+                    <td><%= grade.subject %></td>
+                    <td class="numeric"><strong><%= formatScore(grade.score) %></strong></td>
+                    <td class="numeric"><%= grade.coefficient %></td>
+                    <td class="numeric"><%= formatScore(grade.score * grade.coefficient) %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- Barre latérale -->
+      <aside class="result-aside">
+        <div class="score-card">
+          <span class="score-label">Moyenne générale</span>
+          <div class="score"><%= formatScore(candidate.average) %><small>/20</small></div>
+          <div class="score-divider"></div>
+          <span class="mention-label">Mention</span>
+          <strong class="mention"><%= candidate.mention || '—' %></strong>
+          <div class="score-mark <%= candidate.status === 'Admis' ? 'success-mark' : (candidate.status === 'Admissible' ? 'eligible-mark' : 'failed-mark') %>">
+            <%= candidate.status === 'Admis' ? '✓' : (candidate.status === 'Admissible' ? '●' : '!') %>
+          </div>
+        </div>
+
+        <div class="notice-card">
+          <strong>Document certifié DGEC</strong>
+          <p>Téléchargez votre relevé officiel avec QR Code infalsifiable pour vos inscriptions universitaires ou concours.</p>
+          <a href="/resultats/<%= candidate.pv_number %>/pdf" class="primary-button small-button no-print" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
+            Télécharger le relevé (PDF) <span>↓</span>
+          </a>
+        </div>
+
+        <!-- Code d'authenticité & QR Code -->
+        <div class="verification-card-box">
+          <small>Code d'authenticité :</small>
+          <code><%= candidate.verification_code %></code>
+          <a href="/verifier/<%= candidate.verification_code %>" class="verify-link" target="_blank">
+            🔍 Vérifier la validité du relevé
+          </a>
+        </div>
+
+        <!-- Réclamation -->
+        <div class="claim-prompt-card no-print">
+          <small>Une contestation ou une erreur ?</small>
+          <a href="/reclamation?pv=<%= candidate.pv_number %>&exam=<%= candidate.exam %>" class="claim-link">
+            Déposer une réclamation en ligne →
+          </a>
+        </div>
+      </aside>
+    </div>
+
+    <div class="result-footnote">
+      Document généré par le portail national des examens et concours · Vérifiez l’authenticité sur 
+      <a href="/verifier/<%= candidate.verification_code %>">/verifier/<%= candidate.verification_code %></a>.
+    </div>
+  </div>
+</section>
+<%- include('partials/footer') %>

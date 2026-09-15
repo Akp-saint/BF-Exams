@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<section class="info-section container">
+  <div class="search-card" style="max-width:620px;margin:auto;">
+    <div class="eyebrow">Paiement de démonstration</div>
+    <h1>Finaliser l'inscription</h1>
+    <% if (error) { %><div class="alert alert-error" role="alert"><%= error %></div><% } %>
+    <% if (payment) { %>
+      <div class="alert alert-success" role="status">Paiement simulé confirmé. Référence : <strong><%= payment.payment_reference %></strong></div>
+      <p>Dossier <strong><%= payment.registration_number %></strong> · Montant : <strong><%= payment.amount %> FCFA</strong></p>
+      <a class="primary-button" href="/espace-candidat">Retour à mon espace</a>
+    <% } else if (registration) { %>
+      <p>Dossier <strong><%= registration.registration_number %></strong></p>
+      <p>Montant à payer : <strong><%= registration.fee %> FCFA</strong></p>
+      <form method="post" action="/inscription/paiement/<%= registration.id %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label for="provider">Opérateur simulé</label>
+        <select id="provider" name="provider" required><option>Orange Money</option><option>Moov Money</option><option>Telecel Money</option><option>Guichet</option></select>
+        <button class="primary-button" type="submit">Simuler le paiement <span>→</span></button>
+      </form>
+      <p class="field-help">Aucun argent réel n’est débité dans cette version.</p>
+    <% } %>
+  </div>
+</section>
+<%- include('partials/footer') %>

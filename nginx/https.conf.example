@@ -1,0 +1,19 @@
+server {
+  listen 80;
+  server_name resultats.local;
+  return 301 https://$host$request_uri;
+}
+server {
+  listen 443 ssl;
+  server_name resultats.local;
+  ssl_certificate /etc/nginx/certs/resultats.local.crt;
+  ssl_certificate_key /etc/nginx/certs/resultats.local.key;
+  client_max_body_size 5m;
+  location / {
+    proxy_pass http://app:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto https;
+  }
+}

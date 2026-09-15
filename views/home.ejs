@@ -1,0 +1,100 @@
+<%- include('partials/header') %>
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="eyebrow-line"></span> Service public numérique souverain</div>
+      <h1>Consultez vos<br><em>résultats d’examen.</em></h1>
+      <p class="hero-intro">Retrouvez votre relevé officiel individuel de notes certifié aux examens nationaux du Burkina Faso à l’aide de votre numéro de PV et de votre date de naissance.</p>
+      
+      <div class="exam-pills" aria-label="Examens disponibles">
+        <span>CEP</span><span>BEPC</span><span>BAC (Séries A4, D, C, G2...)</span>
+      </div>
+
+      <div style="margin-top: 25px; display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="/statistiques" class="outline-button" style="display:inline-flex; align-items:center; gap:6px;">
+          📊 Statistiques Nationales
+        </a>
+        <a href="/proclamations" class="outline-button" style="display:inline-flex; align-items:center; gap:6px;">
+          📋 Listes par Jury
+        </a>
+        <a href="/verifier" class="outline-button" style="display:inline-flex; align-items:center; gap:6px;">
+          🔍 Vérifier un QR Code
+        </a>
+      </div>
+    </div>
+
+    <div class="search-card">
+      <div class="card-heading">
+        <div class="card-icon">⌕</div>
+        <div>
+          <h2>Consultation individuelle</h2>
+          <p>Authentification sécurisée conforme aux normes de la CIL.</p>
+        </div>
+      </div>
+
+      <% if (error) { %>
+        <div class="alert alert-error" role="alert"><span>!</span><%= error %></div>
+      <% } %>
+
+      <form action="/resultats" method="post" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <!-- Choix de l'examen -->
+        <label for="exam">Type d’examen <span>*</span></label>
+        <select id="exam" name="exam" required>
+          <option value="" disabled <%= !selectedExam ? 'selected' : '' %>>Sélectionner un examen</option>
+          <option value="CEP" <%= selectedExam === 'CEP' ? 'selected' : '' %>>CEP — Certificat d'études primaires</option>
+          <option value="BEPC" <%= selectedExam === 'BEPC' ? 'selected' : '' %>>BEPC — Brevet d'études du premier cycle</option>
+          <option value="BAC" <%= selectedExam === 'BAC' ? 'selected' : '' %>>BAC — Baccalauréat (Toutes séries)</option>
+        </select>
+
+        <!-- Numéro de PV -->
+        <label for="pv">Numéro de PV <span>*</span></label>
+        <div class="input-wrap">
+          <span class="input-prefix">PV</span>
+          <input id="pv" name="pv" type="text" value="<%= pvNumber %>" placeholder="Ex. BAC-2026-0837" autocomplete="off" required>
+        </div>
+        <p class="field-help">Tel qu'il figure sur votre convocation officielle.</p>
+
+        <!-- Date de naissance (Confidentialité CIL) -->
+        <label for="dob">Date de naissance <span>*</span></label>
+        <input id="dob" name="dob" type="text" value="<%= typeof birthDate !== 'undefined' ? birthDate : '' %>" placeholder="Ex. 22/09/2007 ou 2007-09-22" autocomplete="off" required>
+        <p class="field-help">Protège vos notes personnelles contre les consultations non autorisées.</p>
+
+        <!-- Captcha Anti-robot -->
+        <label for="captcha">Vérification de sécurité (Anti-robot) <span>*</span></label>
+        <div class="captcha-container">
+          <span class="captcha-badge"><%= captchaQuestion %></span>
+          <input type="text" id="captcha" name="captcha" class="captcha-input" placeholder="Résultat" required autocomplete="off">
+          <input type="hidden" name="_captchaToken" value="<%= captchaToken %>">
+        </div>
+
+        <button class="primary-button" type="submit">Consulter mon relevé <span>→</span></button>
+      </form>
+
+      <div class="demo-note">
+        <strong>Exemples pour tester :</strong><br>
+        • BAC (Admis Bien) : <code>BAC-2026-0837</code> (Né le <code>22/09/2007</code>)<br>
+        • BAC (2nd tour) : <code>BAC-2026-0412</code> (Né le <code>14/04/2007</code>)<br>
+        • BEPC : <code>BEPC-2026-0142</code> (Né le <code>07/11/2010</code>)
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="trust-strip">
+  <div class="container trust-grid">
+    <div class="trust-item"><span class="trust-icon">✓</span><div><strong>Relevé Officiel avec QR Code</strong><small>Document certifié infalsifiable</small></div></div>
+    <div class="trust-item"><span class="trust-icon">◷</span><div><strong>Disponible 24h/24 & Temps Réel</strong><small>Plateforme optimisée haute charge</small></div></div>
+    <div class="trust-item"><span class="trust-icon">▣</span><div><strong>Protection des Données (CIL)</strong><small>Authentification par PV et Date de Naissance</small></div></div>
+  </div>
+</section>
+
+<section class="info-section container">
+  <div>
+    <div class="eyebrow">Service public national</div>
+    <h2>Transparence et modernité pour les examens scolaires</h2>
+  </div>
+  <p>Ce portail centralise les résultats proclamés par les jurys du Ministère de l'Éducation Nationale, de l'Alphabétisation et de la Promotion des Langues Nationales. Il permet aux candidats, parents, universités et institutions de vérifier l'authenticité de chaque relevé en un clic.</p>
+</section>
+<%- include('partials/footer') %>
