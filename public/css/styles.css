@@ -160,6 +160,13 @@ body { background: #fbfcfb; }
   .hero-grid { gap: 45px; }
   .hero { padding-top: 55px; }
 }
+
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 34px; }
+  .hero-copy { min-width: 0; }
+  .hero-copy, .hero-intro { max-width: none; }
+  .hero .search-card { width: 100%; max-width: 620px; margin: 0 auto; }
+}
 @media (max-width: 600px) {
   .header-inner { min-height: 76px; }
   .brand { min-width: 0; }
