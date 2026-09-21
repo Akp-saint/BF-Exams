@@ -5,5 +5,9 @@ npm-debug.log
 .env
 .DS_Store
 data/*.sqlite
-backups
+backups/
+uploads/
+*.dump
+*.sql.gz
+*.log
 nginx/certs

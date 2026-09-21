@@ -19,8 +19,8 @@
  * 8. API REST & Webhook SMS : Intégration pour opérateurs mobiles (Orange, Moov, Telecel).
  * 9. Back-Office DGEC (/admin) : Authentification, gestion des jurys et importateur massif CSV.
  * 
- * GUIDE POUR TOUTE IA OU DÉVELOPPEUR REPRENANT LE PROJET :
- * --------------------------------------------------------
+ * DÉMARRAGE ET VALIDATION :
+ * -------------------------
  * - Pour lancer en mode développement : `npm run dev`
  * - Pour exécuter la suite de tests automatisés : `npm test`
  * - Pour lancer avec Docker : `docker-compose up --build`

@@ -12,8 +12,8 @@
  * 5. Back-Office DGEC : Authentification bcrypt et import massif CSV.
  * 6. Intégration HTTP : Route `/health`, API REST `/api/v1/resultats` et Webhook SMS.
  * 
- * GUIDE POUR TOUTE IA OU DÉVELOPPEUR REPRENANT LE PROJET :
- * --------------------------------------------------------
+ * EXÉCUTION DES TESTS :
+ * --------------------
  * Exécution : `npm test` ou `node --test test/app.test.js`
  * ==============================================================================
  */

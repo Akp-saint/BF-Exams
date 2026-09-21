@@ -25,8 +25,8 @@
  *    - Code de contrôle cryptographique unique permettant d'attester que le document
  *      n'a pas été falsifié.
  * 
- * GUIDE POUR TOUTE IA OU DÉVELOPPEUR REPRENANT LE PROJET :
- * --------------------------------------------------------
+ * GÉNÉRATION DES RELEVÉS PDF :
+ * ---------------------------
  * - Le moteur utilise `PDFKit` (sans dépendance Chromium/Puppeteer) pour une 
  *   génération ultra-rapide et légère en mémoire lors des pics d'affluence.
  * - Le QR Code est généré avec la bibliothèque `qrcode` en buffer PNG.

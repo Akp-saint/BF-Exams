@@ -13,8 +13,8 @@
  * 5. L'importation massive de résultats scolaires par fichier CSV / Excel
  *    (avec support des délimiteurs virgule et point-virgule et téléchargement d'un modèle).
  * 
- * GUIDE POUR TOUTE IA OU DÉVELOPPEUR REPRENANT LE PROJET :
- * --------------------------------------------------------
+ * ROUTES D'ADMINISTRATION :
+ * ------------------------
  * - Les comptes sont créés explicitement avec `npm run admin:create`.
  * - L'importateur CSV accepte les colonnes standards :
  *   exam;pv_number;first_name;last_name;birth_date;birth_place;gender;center;jury;series;round;status;mention;average

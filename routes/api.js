@@ -13,8 +13,8 @@
  * 3. Une page de simulation SMS (`GET /simulateur-sms` et `POST /simulateur-sms`)
  *    pour tester visuellement la consultation sans smartphone connecté à Internet.
  * 
- * GUIDE POUR TOUTE IA OU DÉVELOPPEUR REPRENANT LE PROJET :
- * --------------------------------------------------------
+ * API PUBLIQUE DU PORTAIL :
+ * ------------------------
  * - Pour intégrer un opérateur réel, brancher le webhook sur son endpoint API SMS.
  * - Format de syntaxe SMS supporté : "BAC BAC-2026-0837 22/09/2007" ou "BAC-2026-0837".
  * ==============================================================================

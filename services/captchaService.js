@@ -16,8 +16,8 @@
  * 3. Accessibilité : Simple pour un candidat humain (ex: "4 + 3 = ?"), bloquant pour les
  *    scripts de moissonnage automatisé (web scraping massif).
  * 
- * GUIDE POUR TOUTE IA OU DÉVELOPPEUR REPRENANT LE PROJET :
- * --------------------------------------------------------
+ * VALIDATION DU CAPTCHA :
+ * ----------------------
  * - Pour changer la difficulté, ajuster les bornes aléatoires dans `generateCaptcha()`.
  * - `verifyCaptcha(userAnswer, captchaToken, secret)` retourne un booléen (true/false).
  * ==============================================================================
