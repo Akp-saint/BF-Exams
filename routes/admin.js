@@ -75,7 +75,7 @@ router.get('/login', (req, res) => {
     return res.redirect('/admin');
   }
   res.render('admin/login', {
-    pageTitle: 'Connexion DGEC',
+    pageTitle: 'Connexion administration démo',
     error: null,
     identifier: ''
   });
@@ -92,7 +92,7 @@ router.post('/login', async (req, res) => {
     const user = await authenticateUser(identifier, password);
     if (!user) {
       return res.status(401).render('admin/login', {
-        pageTitle: 'Connexion DGEC',
+        pageTitle: 'Connexion administration démo',
         error: 'Identifiant ou mot de passe incorrect.',
         identifier
       });
@@ -105,7 +105,7 @@ router.post('/login', async (req, res) => {
   } catch (err) {
     console.error('Erreur login admin :', err);
     return res.status(500).render('admin/login', {
-      pageTitle: 'Connexion DGEC',
+      pageTitle: 'Connexion administration démo',
       error: 'Erreur technique lors de la tentative de connexion.',
       identifier
     });

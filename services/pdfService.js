@@ -1,29 +1,21 @@
 /**
  * ==============================================================================
- * PORTAIL NATIONAL DES RÉSULTATS D'EXAMENS DU BURKINA FASO
- * SERVICE DE GÉNÉRATION DE RELEVÉ OFFICIEL PDF (services/pdfService.js)
+ * PROJET INDÉPENDANT DE DÉMONSTRATION
+ * SERVICE DE GÉNÉRATION DE RELEVÉ FICTIF PDF (services/pdfService.js)
  * ==============================================================================
  * 
- * Ce service génère un relevé de notes et résultats officiel au format PDF A4,
- * conforme aux présentations de la DGEC (Direction Générale des Examens et Concours).
+ * Ce service génère un exemple fictif de relevé au format PDF A4.
  * 
- * ÉLÉMENTS OFFICIELS INTÉGRÉS :
+ * ÉLÉMENTS DE DÉMONSTRATION :
  * -----------------------------
- * 1. En-tête officiel de la République du Burkina Faso :
- *    - Devise nationale : "La Patrie ou la Mort, nous Vaincrons"
- *    - Ministère de l'Éducation Nationale, de l'Alphabétisation et de la Promotion
- *      des Langues Nationales (MENAPLN)
- *    - Direction Générale des Examens et Concours (DGEC)
- * 2. Bande tricolore officielle aux couleurs du drapeau (Rouge / Vert / Étoile jaune).
+ * 1. En-tête identifiant clairement le document comme une démonstration indépendante.
  * 3. Bloc état civil complet du candidat (Nom, Prénoms, Date & Lieu de naissance, PV).
  * 4. Détails de session : Examen, Série (BAC), Tour, Année, Jury et Centre d'examen.
  * 5. Relevé des notes avec matières, coefficients, points et calcul de la moyenne.
  * 6. Décision finale du Jury (Admis d'office, Admissible au 2nd tour, Ajourné) et Mention.
  * 7. BLOC D'AUTHENTICITÉ NUMÉRIQUE :
  *    - **QR Code scannable haute résolution** généré dynamiquement à la volée.
- *    - Le QR Code contient l'URL officielle de vérification : `/verifier/:verificationCode`.
- *    - Code de contrôle cryptographique unique permettant d'attester que le document
- *      n'a pas été falsifié.
+ *    - Le QR Code mène à la vérification d'un exemple fictif.
  * 
  * GÉNÉRATION DES RELEVÉS PDF :
  * ---------------------------
@@ -45,7 +37,7 @@ function formatNumber(num) {
 }
 
 /**
- * Génère le relevé officiel PDF du candidat avec QR Code intégré
+ * Génère un relevé fictif PDF avec QR Code de démonstration
  * 
  * @param {object} candidate - Objet candidat complet avec `grades`
  * @param {string} baseUrl - URL de base du site pour la cible du QR Code (ex: "http://localhost:3000")
@@ -72,9 +64,9 @@ async function generateCandidatePdf(candidate, baseUrl = 'http://localhost:3000'
         margins: { top: 30, bottom: 30, left: 35, right: 35 },
         info: {
           Title: `Releve_Notes_${candidate.exam}_${candidate.pv_number}`,
-          Author: 'Ministère de l’Éducation Nationale - Burkina Faso',
-          Subject: `Relevé officiel des résultats de l'examen ${candidate.exam}`,
-          Keywords: 'Burkina Faso, DGEC, Examen, Relevé de notes, QR Code'
+          Author: 'Projet indépendant de démonstration',
+          Subject: `Exemple fictif de résultats pour ${candidate.exam}`,
+          Keywords: 'Démonstration, données fictives, relevé de notes'
         }
       });
 
@@ -97,23 +89,19 @@ async function generateCandidatePdf(candidate, baseUrl = 'http://localhost:3000'
       doc.rect(leftMargin + usableWidth / 2, bandY, usableWidth / 2, bandHeight).fill('#006b3f'); // Vert drapeau BF
 
       // ============================================================================
-      // EN-TÊTE OFFICIEL DE LA RÉPUBLIQUE
+      // IDENTIFICATION DU PROJET
       // ============================================================================
       let currentY = 32;
 
-      // Côté Gauche : Ministère & Direction
+      // Avertissement de démonstration
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#1b2924')
-        .text("BURKINA FASO", leftMargin, currentY);
+        .text("PROJET INDÉPENDANT DE DÉMONSTRATION", leftMargin, currentY);
       doc.font('Helvetica-Oblique').fontSize(7.5).fillColor('#6c7873')
-        .text("La Patrie ou la Mort, nous Vaincrons", leftMargin, currentY + 11);
+        .text("Sans affiliation avec le MENAPLN ou la DGEC", leftMargin, currentY + 11);
       doc.font('Helvetica').fontSize(7.5).fillColor('#2c3934')
-        .text("MINISTÈRE DE L'ÉDUCATION NATIONALE,", leftMargin, currentY + 22)
-        .text("DE L'ALPHABÉTISATION ET DE LA PROMOTION", leftMargin, currentY + 31)
-        .text("DES LANGUES NATIONALES", leftMargin, currentY + 40);
-      doc.font('Helvetica-Bold').fontSize(7.5).fillColor('#006b3f')
-        .text("DIRECTION GÉNÉRALE DES EXAMENS ET CONCOURS", leftMargin, currentY + 50);
+        .text("DONNÉES ET RÉSULTATS ENTIÈREMENT FICTIFS", leftMargin, currentY + 22);
 
-      // Côté Droit : Sceau et Références de Session
+      // Références de l'exemple
       const rightAlignX = leftMargin + usableWidth - 210;
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#1b2924')
         .text("SESSION NORMALE 2026", rightAlignX, currentY, { width: 210, align: 'right' });
@@ -131,7 +119,7 @@ async function generateCandidatePdf(candidate, baseUrl = 'http://localhost:3000'
       doc.rect(leftMargin, currentY, usableWidth, 34).fillAndStroke('#f3f8f5', '#c8ded2');
       doc.font('Helvetica-Bold').fontSize(13).fillColor('#004c2c')
         .text(
-          `RELEVÉ OFFICIEL INDIVIDUEL DE NOTES — ${candidate.exam}`,
+          `RELEVÉ FICTIF DE DÉMONSTRATION — ${candidate.exam}`,
           leftMargin,
           currentY + 6,
           { width: usableWidth, align: 'center' }
@@ -265,10 +253,10 @@ async function generateCandidatePdf(candidate, baseUrl = 'http://localhost:3000'
       doc.font('Helvetica-Bold').fontSize(22).fillColor('#004c2c')
         .text(`${formatNumber(candidate.average)} / 20`, leftMargin + 15, currentY + 23);
 
-      // Bloc Décision Officielle
+      // Bloc résultat simulé
       const decX = leftMargin + 175;
       doc.font('Helvetica').fontSize(7.5).fillColor('#6c7873')
-        .text("DÉCISION PROCLAMÉE PAR LE JURY :", decX, currentY + 10);
+        .text("RÉSULTAT DE DÉMONSTRATION :", decX, currentY + 10);
       
       const statusLabel = candidate.status.toUpperCase() === 'ADMIS' 
         ? 'DÉCLARÉ(E) ADMIS(E)' 
@@ -286,7 +274,7 @@ async function generateCandidatePdf(candidate, baseUrl = 'http://localhost:3000'
       currentY += decisionH + 16;
 
       // ============================================================================
-      // SECTION 4 : AUTHENTICITÉ NUMÉRIQUE & QR CODE (INFALSIFIABLE)
+      // SECTION 4 : VÉRIFICATION DE L'EXEMPLE
       // ============================================================================
       const authBoxH = 82;
       doc.rect(leftMargin, currentY, usableWidth, authBoxH).fillAndStroke('#fafcfb', '#006b3f');
@@ -296,20 +284,19 @@ async function generateCandidatePdf(candidate, baseUrl = 'http://localhost:3000'
 
       const authTextX = leftMargin + 85;
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#004c2c')
-        .text("CERTIFICATION D'AUTHENTICITÉ NUMÉRIQUE DU RELEVÉ", authTextX, currentY + 10);
+        .text("VÉRIFICATION DE L'EXEMPLE FICTIF", authTextX, currentY + 10);
 
       doc.font('Helvetica').fontSize(7.5).fillColor('#2c3934')
         .text(
-          "Ce relevé de notes est certifié conforme aux délibérations officielles du jury d'examen. " +
-          "Toute institution ou employeur peut vérifier l'authenticité de ce document en scannant le QR code " +
-          "ci-contre avec un smartphone ou en renseignant le code de vérification ci-dessous sur le portail officiel.",
+          "Ce document est un exemple généré avec des données fictives. Il n'a aucune valeur officielle, " +
+          "ne certifie aucun résultat réel et ne peut pas servir de justificatif.",
           authTextX,
           currentY + 23,
           { width: usableWidth - 95, lineGap: 1 }
         );
 
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#1b2924')
-        .text(`CODE DE VÉRIFICATION : `, authTextX, currentY + 57, { continued: true });
+        .text(`CODE DE DÉMONSTRATION : `, authTextX, currentY + 57, { continued: true });
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#006b3f')
         .text(candidate.verification_code);
 
@@ -317,7 +304,7 @@ async function generateCandidatePdf(candidate, baseUrl = 'http://localhost:3000'
         .text(`Lien direct : ${verificationUrl}`, authTextX, currentY + 69, { width: usableWidth - 95 });
 
       // ============================================================================
-      // PIED DE PAGE ET SIGNATURES OFFICIELLES
+      // AVERTISSEMENT DE FIN DE PAGE
       // ============================================================================
       const footY = doc.page.height - 50;
 
@@ -325,14 +312,11 @@ async function generateCandidatePdf(candidate, baseUrl = 'http://localhost:3000'
 
       doc.font('Helvetica').fontSize(7).fillColor('#6c7873')
         .text(
-          "Direction Générale des Examens et Concours (DGEC) · Ouagadougou, Burkina Faso · Document officiel généré numériquement.",
+          "Projet indépendant · Données fictives · Document sans valeur officielle.",
           leftMargin,
           footY + 6,
           { align: 'center', width: usableWidth }
         );
-      doc.font('Helvetica-Bold').fontSize(6.5).fillColor('#006b3f')
-        .text("La Patrie ou la Mort, nous Vaincrons", leftMargin, footY + 18, { align: 'center', width: usableWidth });
-
       // Finalisation du document
       doc.end();
     } catch (err) {

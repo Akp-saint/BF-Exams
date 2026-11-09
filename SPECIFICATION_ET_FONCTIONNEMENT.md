@@ -1,7 +1,7 @@
-# DOSSIER D'ARCHITECTURE FONCTIONNELLE ET TECHNIQUE DÉTAILLÉ
-## Portail National des Résultats des Examens Scolaires — Burkina Faso
-**Ministère de l'Éducation Nationale, de l'Alphabétisation et de la Promotion des Langues Nationales (MENAPLN)**  
-**Direction Générale des Examens et Concours (DGEC)**
+# DOSSIER DE CONCEPTION — PROJET INDÉPENDANT DE DÉMONSTRATION
+## Exemple de portail de résultats d'examens — Burkina Faso
+
+> Ce document décrit un prototype indépendant. Il ne représente ni un système officiel, ni un partenariat ou une approbation du MENAPLN, de la DGEC ou d'une autre administration. Les données de démonstration sont fictives et les parcours décrits ne doivent pas être utilisés avec des résultats ou renseignements réels.
 
 ---
 

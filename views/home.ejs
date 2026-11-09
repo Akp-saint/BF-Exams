@@ -2,9 +2,9 @@
 <section class="hero">
   <div class="container hero-grid">
     <div class="hero-copy">
-      <div class="eyebrow"><span class="eyebrow-line"></span> MENAPLN · DGEC · Burkina Faso</div>
-      <h1>Vos examens,<br><em>un accès officiel.</em></h1>
-      <p class="hero-intro">Consultez un résultat certifié, inscrivez-vous à une session et gardez vos démarches scolaires au même endroit.</p>
+      <div class="eyebrow"><span class="eyebrow-line"></span> Projet indépendant · Démonstration</div>
+      <h1>Un portail de résultats,<br><em>en version démo.</em></h1>
+      <p class="hero-intro">Explorez un exemple de portail d'examens. Les résultats, comptes et paiements sont simulés et n'ont aucune valeur officielle.</p>
       
       <div class="exam-pills" aria-label="Examens disponibles">
         <span>CEP</span><span>BEPC</span><span>BAC (Séries A4, D, C, G2...)</span>
@@ -55,15 +55,14 @@
           <span class="input-prefix">PV</span>
           <input id="pv" name="pv" type="text" value="<%= pvNumber %>" placeholder="Ex. BAC-2026-0837" autocomplete="off" required>
         </div>
-        <p class="field-help">Tel qu'il figure sur votre convocation officielle.</p>
+        <p class="field-help">Utilisez uniquement les références fictives affichées ci-dessous.</p>
 
         <!-- Date de naissance (Confidentialité CIL) -->
         <label for="dob">Date de naissance <span>*</span></label>
         <input id="dob" name="dob" type="text" value="<%= typeof birthDate !== 'undefined' ? birthDate : '' %>" placeholder="Ex. 22/09/2007 ou 2007-09-22" autocomplete="off" required>
-        <p class="field-help">Protège vos notes personnelles contre les consultations non autorisées.</p>
+        <p class="field-help">Les données affichées sont fictives et servent uniquement à la démonstration.</p>
 
-        <!-- Captcha Anti-robot -->
-        <label for="captcha">Vérification de sécurité (Anti-robot) <span>*</span></label>
+        <label for="captcha">Petit défi arithmétique <span>*</span></label>
         <div class="captcha-container">
           <span class="captcha-badge"><%= captchaQuestion %></span>
           <input type="text" id="captcha" name="captcha" class="captcha-input" placeholder="Résultat" required autocomplete="off">
@@ -74,7 +73,7 @@
       </form>
 
       <div class="demo-note">
-        <strong>Exemples pour tester :</strong><br>
+        <strong>Exemples fictifs pour tester :</strong><br>
         • BAC (Admis Bien) : <code>BAC-2026-0837</code> (Né le <code>22/09/2007</code>)<br>
         • BAC (2nd tour) : <code>BAC-2026-0412</code> (Né le <code>14/04/2007</code>)<br>
         • BEPC : <code>BEPC-2026-0142</code> (Né le <code>07/11/2010</code>)
@@ -85,17 +84,17 @@
 
 <section class="trust-strip">
   <div class="container trust-grid">
-    <div class="trust-item"><span class="trust-icon">✓</span><div><strong>Relevé Officiel avec QR Code</strong><small>Document certifié infalsifiable</small></div></div>
+    <div class="trust-item"><span class="trust-icon">✓</span><div><strong>Relevé de démonstration</strong><small>Sans valeur officielle</small></div></div>
     <div class="trust-item"><span class="trust-icon">◷</span><div><strong>Disponible 24h/24 & Temps Réel</strong><small>Plateforme optimisée haute charge</small></div></div>
-    <div class="trust-item"><span class="trust-icon">▣</span><div><strong>Protection des Données (CIL)</strong><small>Authentification par PV et Date de Naissance</small></div></div>
+    <div class="trust-item"><span class="trust-icon">▣</span><div><strong>Jeu de données fictif</strong><small>N'utilisez aucune donnée personnelle réelle</small></div></div>
   </div>
 </section>
 
 <section class="info-section container">
   <div>
-    <div class="eyebrow">Service public national</div>
+    <div class="eyebrow">Projet de démonstration indépendant</div>
     <h2>Transparence et modernité pour les examens scolaires</h2>
   </div>
-  <p>Ce portail centralise les résultats proclamés par les jurys du Ministère de l'Éducation Nationale, de l'Alphabétisation et de la Promotion des Langues Nationales. Il permet aux candidats, parents, universités et institutions de vérifier l'authenticité de chaque relevé en un clic.</p>
+  <p>Cette application illustre des parcours de consultation et d'inscription avec des données fictives. Elle n'est ni un service public ni un portail officiel, et n'est affiliée à aucune administration.</p>
 </section>
 <%- include('partials/footer') %>

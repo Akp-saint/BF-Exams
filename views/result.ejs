@@ -5,7 +5,7 @@
       <a href="/" class="back-link">← Nouvelle recherche</a>
       <div style="display:flex; gap:10px; align-items:center;">
         <a href="/resultats/<%= candidate.pv_number %>/pdf" class="primary-button outline-button" style="display:inline-flex; align-items:center; text-decoration:none; padding:10px 16px;">
-          ⬇ Télécharger Relevé PDF Officiel
+          ⬇ Télécharger le PDF de démonstration
         </a>
         <button type="button" class="outline-button" onclick="window.print()">▣ Imprimer</button>
       </div>
@@ -13,7 +13,7 @@
 
     <div class="result-header">
       <div>
-        <div class="eyebrow"><span class="eyebrow-line"></span> Résultat officiel certifié DGEC</div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> Résultat de démonstration</div>
         <h1><%= candidate.exam %> <span>— Session <%= candidate.session_year %></span></h1>
         <p class="result-subtitle">
           Relevé individuel de notes · N° PV <strong><%= candidate.pv_number %></strong>
@@ -92,10 +92,10 @@
         </div>
 
         <div class="notice-card">
-          <strong>Document certifié DGEC</strong>
-          <p>Téléchargez votre relevé officiel avec QR Code infalsifiable pour vos inscriptions universitaires ou concours.</p>
+          <strong>Document fictif de démonstration</strong>
+          <p>Ce relevé n'est pas officiel et ne peut pas servir de justificatif.</p>
           <a href="/resultats/<%= candidate.pv_number %>/pdf" class="primary-button small-button no-print" style="display:flex; align-items:center; justify-content:center; text-decoration:none;">
-            Télécharger le relevé (PDF) <span>↓</span>
+            Télécharger le relevé de démo <span>↓</span>
           </a>
         </div>
 

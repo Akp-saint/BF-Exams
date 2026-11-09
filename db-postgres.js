@@ -3,22 +3,49 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const { Pool } = require('pg');
+const { generateVerificationCode } = require('./services/verificationCode');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: Number(process.env.DB_POOL_MAX || 20),
-  ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : undefined
+  ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: true } : undefined
 });
 
 const schemaSql = fs.readFileSync(path.join(__dirname, 'migrations', '001_initial.sql'), 'utf8');
+const verificationCodeMigrationSql = fs.readFileSync(
+  path.join(__dirname, 'migrations', '002_opaque_verification_codes.sql'),
+  'utf8'
+);
 
 let ready;
+async function applyVerificationCodeMigration() {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const migration = await client.query(
+      `INSERT INTO schema_migrations(version) VALUES ('002_opaque_verification_codes')
+       ON CONFLICT (version) DO NOTHING RETURNING version`
+    );
+    if (migration.rowCount > 0) await client.query(verificationCodeMigrationSql);
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 async function migrate() {
   if (!ready) {
-    ready = pool.query(schemaSql).then(() => pool.query(
-      `INSERT INTO schema_migrations(version) VALUES ('001_initial')
-       ON CONFLICT (version) DO NOTHING`
-    ));
+    ready = (async () => {
+      await pool.query(schemaSql);
+      await pool.query(
+        `INSERT INTO schema_migrations(version) VALUES ('001_initial')
+         ON CONFLICT (version) DO NOTHING`
+      );
+      await applyVerificationCodeMigration();
+    })();
   }
   await ready;
 }
@@ -35,11 +62,6 @@ function normalizeDate(input) {
     return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
   }
   return value;
-}
-
-function generateVerificationCode(exam, pvNumber, sessionYear = 2026) {
-  const cleanPv = String(pvNumber || '').replace(/[^A-Z0-9]/gi, '').slice(-4).toUpperCase() || '0001';
-  return `BF-${sessionYear}-${exam}-${cleanPv}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
 }
 
 function normalizeCandidateMention(candidate) {
@@ -174,7 +196,7 @@ async function logAudit({ user, action, resourceType = null, resourceId = null, 
 
 async function createClaim(data) {
   await migrate();
-  const claimNumber = `REC-${new Date().getFullYear()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+  const claimNumber = `REC-${new Date().getFullYear()}-${crypto.randomUUID().replace(/-/g, '').toUpperCase()}`;
   const result = await pool.query(`INSERT INTO claims(claim_number,pv_number,candidate_name,exam,claim_type,description,phone,email)
     VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`, [
     claimNumber, String(data.pv_number).toUpperCase().trim(), String(data.candidate_name).trim(),

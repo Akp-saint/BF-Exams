@@ -30,6 +30,7 @@ const { findCandidate, findCandidateByPv, getStatistics } = require('../db');
  * GET /api/v1/resultats?exam=BAC&pv=BAC-2026-0837&dob=22/09/2007
  */
 router.get('/resultats', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const { exam, pv, dob } = req.query;
 
   if (!exam || !pv) {
@@ -132,7 +133,7 @@ router.post('/sms-webhook', async (req, res) => {
   if (!pv || !dob) {
     return res.json({
       sender,
-      response_sms: "MENAPLN/DGEC : Format incorrect. Envoyez : EXAMEN NUMERO_PV DATE_NAISSANCE (Ex: BAC BAC-2026-0837 22/09/2007)"
+      response_sms: "Examens BF (démo) : Format incorrect. Envoyez : EXAMEN NUMERO_PV DATE_NAISSANCE."
     });
   }
 
@@ -141,12 +142,12 @@ router.post('/sms-webhook', async (req, res) => {
     if (!candidate) {
       return res.json({
         sender,
-        response_sms: `MENAPLN/DGEC : Aucun résultat trouvé pour le PV ${pv} (${exam}). Vérifiez vos références.`
+        response_sms: `Examens BF (démo) : Aucun exemple trouvé pour le PV ${pv} (${exam}).`
       });
     }
 
     const publicBaseUrl = String(process.env.PUBLIC_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
-    const shortSms = `MENAPLN/DGEC : ${candidate.exam} 2026 ${candidate.last_name} ${candidate.first_name} (PV:${candidate.pv_number}). Statut: ${candidate.status.toUpperCase()}${candidate.mention && candidate.mention !== '—' ? ' (' + candidate.mention + ')' : ''}. Moy: ${candidate.average}/20. Relevé certifié : ${publicBaseUrl}/verifier/${candidate.verification_code}`;
+    const shortSms = `Examens BF (démo) : Exemple fictif ${candidate.exam} ${candidate.last_name} ${candidate.first_name} (PV:${candidate.pv_number}), statut ${candidate.status}. Aucun résultat réel n'est certifié. ${publicBaseUrl}/verifier/${candidate.verification_code}`;
 
     return res.json({
       sender,
@@ -156,12 +157,12 @@ router.post('/sms-webhook', async (req, res) => {
     if (err.code === 'DATE_MISMATCH') {
       return res.json({
         sender,
-        response_sms: `MENAPLN/DGEC : Date de naissance incorrecte pour le PV ${pv}. Consultation refusée pour motif de confidentialité.`
+        response_sms: `Examens BF (démo) : Date incorrecte pour le PV ${pv}.`
       });
     }
     return res.json({
       sender,
-      response_sms: "MENAPLN/DGEC : Service momentanément indisponible. Réessayez plus tard."
+      response_sms: "Examens BF (démo) : Service momentanément indisponible. Réessayez plus tard."
     });
   }
 });

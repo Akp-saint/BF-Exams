@@ -7,7 +7,7 @@
  * Cette suite valide l'intégralité des briques fonctionnelles et de sécurité :
  * 1. Métier & Base PostgreSQL/fixtures : Recherche, Séries BAC, 2nd Tour, Code QR, Statistiques.
  * 2. Protection CIL : Refus systématique en cas de date de naissance erronée.
- * 3. Captcha Anti-Robot : Génération stateless et vérification HMAC-SHA256.
+ * 3. Défi arithmétique : Jeton chiffré et vérification de réponse.
  * 4. Générateur PDF : Format binaire %PDF, QR Code, notes et mentions.
  * 5. Back-Office DGEC : Authentification bcrypt et import massif CSV.
  * 6. Intégration HTTP : Route `/health`, API REST `/api/v1/resultats` et Webhook SMS.
@@ -112,15 +112,22 @@ describe('1. Tests Métier et Base de données (db.js)', () => {
   });
 
   it('Vérification d’authenticité par QR Code (verifyCandidateByCode)', async () => {
-    const verified = await db.verifyCandidateByCode('BF-2026-BAC-0837-7D9A');
+    const verified = await db.verifyCandidateByCode('TEST-00000000000000000000000000000001');
     assert.ok(verified, 'Le code officiel doit certifier le document');
     assert.strictEqual(verified.pv_number, 'BAC-2026-0837');
-    assert.strictEqual(verified.verification_code, 'BF-2026-BAC-0837-7D9A');
+    assert.strictEqual(verified.verification_code, 'TEST-00000000000000000000000000000001');
   });
 
   it('Vérification code inexistant ou falsifié', async () => {
     const fake = await db.verifyCandidateByCode('CODE-FALSIFIE-9999');
     assert.strictEqual(fake, null, 'Un faux code ne doit rien retourner');
+  });
+
+  it('Génère des codes de vérification opaques et imprévisibles', () => {
+    const first = db.generateVerificationCode();
+    const second = db.generateVerificationCode();
+    assert.match(first, /^BF-[A-F0-9]{64}$/);
+    assert.notStrictEqual(first, second);
   });
 
   it('Calcul des statistiques globales et par série', async () => {
@@ -229,13 +236,14 @@ describe('1. Tests Métier et Base de données (db.js)', () => {
   });
 });
 
-describe('2. Tests Sécurité Anti-Robot (services/captchaService.js)', () => {
+describe('2. Tests du défi arithmétique (services/captchaService.js)', () => {
   const testSecret = 'secret-test-dgec-burkina';
 
-  it('Génération d’un défi arithmétique et son jeton HMAC', () => {
+  it('Génération d’un défi arithmétique avec un jeton chiffré', () => {
     const captcha = generateCaptcha(testSecret);
     assert.ok(captcha.question.includes('+'), 'Doit être une addition arithmétique');
-    assert.ok(captcha.token.length > 20, 'Jeton base64 signé présent');
+    assert.ok(captcha.token.length > 20, 'Jeton chiffré présent');
+    assert.doesNotMatch(Buffer.from(captcha.token, 'base64url').toString('utf8'), /^\d{1,2}:\d+:/);
   });
 
   it('Validation de la bonne réponse', () => {
@@ -253,6 +261,11 @@ describe('2. Tests Sécurité Anti-Robot (services/captchaService.js)', () => {
   it('Rejet d’un jeton falsifié', () => {
     const captcha = generateCaptcha(testSecret);
     assert.strictEqual(verifyCaptcha('5', 'jeton-falsifie', testSecret), false);
+  });
+
+  it('Rejet du jeton avec un secret différent', () => {
+    const captcha = generateCaptcha(testSecret);
+    assert.strictEqual(verifyCaptcha('10', captcha.token, 'un-autre-secret'), false);
   });
 });
 
@@ -277,27 +290,34 @@ describe('4. Tests d’Intégration HTTP et API', () => {
     assert.strictEqual(res.statusCode, 200);
     const json = JSON.parse(res.body);
     assert.strictEqual(json.status, 'UP');
-    assert.strictEqual(json.service, 'Portail Résultats Burkina Faso');
+    assert.strictEqual(json.service, 'Examens BF (démo)');
   });
 
   it('GET /statistiques renvoie la page des statistiques (200)', async () => {
     const res = await makeRequest('/statistiques');
     assert.strictEqual(res.statusCode, 200);
-    assert.ok(res.body.includes('Statistiques Nationales'));
+    assert.ok(res.body.includes('Statistiques de démonstration'));
   });
 
   it('GET /proclamations renvoie la liste par jury (200)', async () => {
     const res = await makeRequest('/proclamations');
     assert.strictEqual(res.statusCode, 200);
-    assert.ok(res.body.includes('Listes de Proclamation'));
-    assert.ok(!res.body.includes('Salimata'), 'Les résultats nominatifs ne doivent pas être publics');
+    assert.ok(res.body.includes('Exemples de jurys'));
+    assert.ok(!res.body.includes('Salimata'), 'Les résultats nominatifs ne doivent pas apparaître dans les proclamations');
   });
 
-  it('GET /verifier/:code certifie un résultat officiel (200)', async () => {
-    const res = await makeRequest('/verifier/BF-2026-BAC-0837-7D9A');
+  it('GET /verifier/:code affiche un exemple de démonstration (200)', async () => {
+    const res = await makeRequest('/verifier/TEST-00000000000000000000000000000001');
     assert.strictEqual(res.statusCode, 200);
-    assert.ok(res.body.includes('Document Officiel Authentique Certifié'));
+    assert.ok(res.body.includes('exemple fictif'));
+    assert.strictEqual(res.headers['cache-control'], 'no-store');
     assert.ok(res.body.includes('Salimata'));
+  });
+
+  it('refuse le PDF sans résultat préalablement vérifié et sans mise en cache', async () => {
+    const res = await makeRequest('/resultats/BAC-2026-0837/pdf');
+    assert.strictEqual(res.statusCode, 403);
+    assert.strictEqual(res.headers['cache-control'], 'no-store');
   });
 
   it('GET /api/v1/resultats retourne le résultat au format JSON pour partenaires', async () => {
@@ -307,6 +327,7 @@ describe('4. Tests d’Intégration HTTP et API', () => {
     assert.strictEqual(json.success, true);
     assert.strictEqual(json.data.pv_number, 'BAC-2026-0837');
     assert.strictEqual(json.data.status, 'Admis');
+    assert.strictEqual(res.headers['cache-control'], 'no-store');
   });
 
   it('POST /api/v1/sms-webhook traite une demande SMS opérateur', async () => {
@@ -324,7 +345,17 @@ describe('4. Tests d’Intégration HTTP et API', () => {
     });
     assert.strictEqual(res.statusCode, 200);
     const json = JSON.parse(res.body);
-    assert.ok(json.response_sms.includes('ADMIS'));
-    assert.ok(json.response_sms.includes('MENAPLN/DGEC'));
+    assert.ok(json.response_sms.includes('statut Admis'));
+    assert.ok(json.response_sms.includes('Examens BF (démo)'));
+  });
+
+  it('limite les recherches sensibles GET par adresse IP', async () => {
+    let response;
+    for (let i = 0; i < 31; i++) {
+      response = await makeRequest('/verifier/inconnu', {
+        headers: { 'X-Forwarded-For': '198.51.100.77' }
+      });
+    }
+    assert.strictEqual(response.statusCode, 429);
   });
 });

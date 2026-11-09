@@ -117,6 +117,10 @@ app.use(cookieParser(csrfSecret));
 app.use(express.urlencoded({ extended: false, limit: '50kb' }));
 app.use(express.json()); // Permet la réception des webhooks et payloads API
 app.use(express.static(path.join(__dirname, 'public')));
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 
 // Gestion des sessions utilisateur (pour le back-office /admin)
 app.use(session({
@@ -171,13 +175,22 @@ app.use((req, res, next) => {
 
 // Limiteur de requêtes (Rate Limiter) contre les attaques par force brute
 app.use((req, res, next) => {
-  if (req.method !== 'POST') return next();
+  const sensitiveLookup = req.method === 'GET' && (
+    req.path === '/api/v1/resultats'
+    || req.path === '/verifier'
+    || req.path.startsWith('/verifier/')
+    || req.path === '/reclamation/suivi'
+  );
+  if (req.method !== 'POST' && !sensitiveLookup) return next();
+
   const now = Date.now();
   const address = req.ip || req.socket.remoteAddress || 'unknown';
   const recent = (requestLog.get(address) || []).filter((timestamp) => now - timestamp < 60_000);
+  const limit = req.path === '/admin/login' || req.path === '/inscription/connexion'
+    ? 10
+    : sensitiveLookup ? 30 : 60;
   
-  // 60 requêtes POST par minute autorisées par IP
-  if (recent.length >= 60) {
+  if (recent.length >= limit) {
     return res.status(429).render('error', {
       pageTitle: 'Trop de requêtes',
       message: 'Veuillez patienter une minute avant de réessayer pour éviter toute surcharge.'
@@ -298,6 +311,7 @@ app.get('/inscription/deconnexion', (req, res) => req.session.destroy(() => res.
  * Exige : Examen, Numéro de PV, Date de naissance (Normes CIL), et Captcha
  */
 app.post('/resultats', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const selectedExam = String(req.body.exam || '').trim().toUpperCase();
   const pvNumber = String(req.body.pv || '').trim().toUpperCase();
   const birthDate = String(req.body.dob || '').trim();
@@ -431,6 +445,7 @@ app.get('/resultats/:pv/pdf', async (req, res) => {
  * GET /verifier/:code ou GET /verifier?code=...
  */
 app.get(['/verifier', '/verifier/:code'], async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const code = String(req.params.code || req.query.code || '').trim().toUpperCase();
 
   if (!code) {
@@ -575,6 +590,7 @@ app.post('/reclamation', async (req, res) => {
  * GET /reclamation/suivi
  */
 app.get('/reclamation/suivi', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const claimNumber = req.query.claim_number;
 
   try {
@@ -604,7 +620,7 @@ app.get('/health', (req, res) => {
     status: 'UP',
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
-    service: 'Portail Résultats Burkina Faso',
+    service: 'Examens BF (démo)',
     version: '2.0.0'
   });
 });
@@ -625,7 +641,7 @@ app.use((req, res) => res.status(404).render('error', {
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, '0.0.0.0', () => {
     console.log(`Portail de résultats disponible sur le port ${port}`);
-    console.log(`Espace administration DGEC : http://localhost:${port}/admin`);
+    console.log(`Administration démo : http://localhost:${port}/admin`);
   });
 }
 

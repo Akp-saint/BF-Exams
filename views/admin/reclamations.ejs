@@ -2,7 +2,7 @@
 <section class="result-page">
   <div class="container">
     <div class="result-toolbar no-print">
-      <a href="/admin" class="back-link">← Retour au tableau de bord DGEC</a>
+      <a href="/admin" class="back-link">← Retour à l'administration démo</a>
     </div>
 
     <div class="result-header">
@@ -89,7 +89,7 @@
                         <option value="Approuvée" <%= c.status === 'Approuvée' ? 'selected' : '' %>>Approuvée (Rectifiée)</option>
                         <option value="Rejetée" <%= c.status === 'Rejetée' ? 'selected' : '' %>>Rejetée (Non fondée)</option>
                       </select>
-                      <input type="text" name="admin_notes" value="<%= c.admin_notes || '' %>" placeholder="Avis/réponse officielle..." style="height:32px; font-size:11px; padding:0 8px; margin-bottom:6px;">
+                      <input type="text" name="admin_notes" value="<%= c.admin_notes || '' %>" placeholder="Réponse de démonstration..." style="height:32px; font-size:11px; padding:0 8px; margin-bottom:6px;">
                       <button type="submit" class="primary-button small-button" style="min-height:28px; padding:0 10px; font-size:10px;">
                         Enregistrer décision
                       </button>

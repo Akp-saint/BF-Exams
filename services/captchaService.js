@@ -1,20 +1,17 @@
 /**
  * ==============================================================================
  * PORTAIL NATIONAL DES RÉSULTATS D'EXAMENS DU BURKINA FASO
- * SERVICE DE PROTECTION ANTI-ROBOT / CAPTCHA (services/captchaService.js)
+ * SERVICE DE DÉFI ARITHMÉTIQUE (services/captchaService.js)
  * ==============================================================================
  * 
- * Ce service génère et vérifie des défis Captcha arithmétiques légers et sécurisés.
+ * Ce service génère et vérifie des défis arithmétiques légers pour la démonstration.
  * 
  * AVANTAGES CLÉS :
  * ----------------
  * 1. 100% Autonome : Aucun besoin de clé API externe (Google reCAPTCHA / Cloudflare Turnstile).
  *    Fonctionne parfaitement hors-ligne, en réseau local et sur serveur national souverain.
- * 2. Sans état (Stateless) : La solution attendue est hachée par HMAC-SHA256 avec le
- *    secret de l'application (`CSRF_SECRET`) et un horodatage d'expiration (5 minutes).
- *    Aucune mémoire serveur n'est gaspillée, résistant aux fortes charges.
- * 3. Accessibilité : Simple pour un candidat humain (ex: "4 + 3 = ?"), bloquant pour les
- *    scripts de moissonnage automatisé (web scraping massif).
+ * 2. Le contenu de validation est chiffré avec AES-256-GCM et expire après cinq minutes.
+ * 3. Ce défi simple n'est pas une protection anti-bot suffisante pour une production.
  * 
  * VALIDATION DU CAPTCHA :
  * ----------------------
@@ -24,6 +21,12 @@
  */
 
 const crypto = require('crypto');
+const IV_LENGTH = 12;
+const TAG_LENGTH = 16;
+
+function getEncryptionKey(secret) {
+  return crypto.createHash('sha256').update('exam-bf-captcha-v1\0').update(secret).digest();
+}
 
 /**
  * Génère un défi Captcha arithmétique et son jeton de validation signé
@@ -32,15 +35,18 @@ const crypto = require('crypto');
  * @returns {{ question: string, token: string }}
  */
 function generateCaptcha(secret) {
-  const num1 = Math.floor(Math.random() * 9) + 1; // 1 à 9
-  const num2 = Math.floor(Math.random() * 9) + 1; // 1 à 9
+  const num1 = crypto.randomInt(1, 10);
+  const num2 = crypto.randomInt(1, 10);
   const answer = String(num1 + num2);
   const expiresAt = Date.now() + 5 * 60 * 1000; // Valide 5 minutes
 
-  // Construction de la signature HMAC : answer:expiresAt:signature
-  const payload = `${answer}:${expiresAt}`;
-  const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
-  const token = Buffer.from(`${payload}:${signature}`).toString('base64');
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv('aes-256-gcm', getEncryptionKey(secret), iv);
+  const ciphertext = Buffer.concat([
+    cipher.update(JSON.stringify({ answer, expiresAt }), 'utf8'),
+    cipher.final()
+  ]);
+  const token = Buffer.concat([iv, cipher.getAuthTag(), ciphertext]).toString('base64url');
 
   return {
     question: `${num1} + ${num2} = ?`,
@@ -57,31 +63,26 @@ function generateCaptcha(secret) {
  * @returns {boolean} - Vrai si la réponse est valide et non expirée
  */
 function verifyCaptcha(userAnswer, token, secret) {
-  if (!userAnswer || !token || !secret) return false;
+  if (!userAnswer || typeof token !== 'string' || token.length > 256 || !secret) return false;
 
   try {
-    const decoded = Buffer.from(token, 'base64').toString('utf8');
-    const [expectedAnswer, expiresAtStr, signature] = decoded.split(':');
+    if (!/^[A-Za-z0-9_-]+$/.test(token)) return false;
+    const encoded = Buffer.from(token, 'base64url');
+    if (encoded.length <= IV_LENGTH + TAG_LENGTH) return false;
 
-    if (!expectedAnswer || !expiresAtStr || !signature) return false;
+    const iv = encoded.subarray(0, IV_LENGTH);
+    const authTag = encoded.subarray(IV_LENGTH, IV_LENGTH + TAG_LENGTH);
+    const ciphertext = encoded.subarray(IV_LENGTH + TAG_LENGTH);
+    const decipher = crypto.createDecipheriv('aes-256-gcm', getEncryptionKey(secret), iv);
+    decipher.setAuthTag(authTag);
+    const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
+    const payload = JSON.parse(plaintext);
+    if (typeof payload.answer !== 'string' || !Number.isSafeInteger(payload.expiresAt)
+      || Date.now() > payload.expiresAt) return false;
 
-    // Vérification de l'expiration
-    const expiresAt = Number(expiresAtStr);
-    if (Date.now() > expiresAt) {
-      return false; // Captcha expiré
-    }
-
-    // Vérification de la signature cryptographique
-    const payload = `${expectedAnswer}:${expiresAtStr}`;
-    const expectedSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
-
-    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-      return false; // Signature invalide (tentative de falsification)
-    }
-
-    // Vérification de la réponse
-    const cleanUserAnswer = String(userAnswer).trim();
-    return cleanUserAnswer === expectedAnswer;
+    const expected = Buffer.from(payload.answer);
+    const submitted = Buffer.from(String(userAnswer).trim());
+    return expected.length === submitted.length && crypto.timingSafeEqual(submitted, expected);
   } catch (err) {
     return false;
   }

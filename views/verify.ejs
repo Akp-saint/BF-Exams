@@ -10,14 +10,14 @@
       <div class="verification-banner is-valid">
         <div class="banner-icon">✓</div>
         <div>
-          <h2>Document Officiel Authentique Certifié</h2>
-          <p>Ce relevé de notes est enregistré dans le registre national de la DGEC (Direction Générale des Examens et Concours du Burkina Faso).</p>
+          <h2>Exemple trouvé dans les données de démonstration</h2>
+          <p>Cette vérification concerne uniquement un exemple fictif. Elle ne confirme aucun document officiel et n'a aucune valeur administrative.</p>
         </div>
       </div>
 
       <div class="result-header">
         <div>
-          <div class="eyebrow"><span class="eyebrow-line"></span> Certificat d’authenticité n° <%= candidate.verification_code %></div>
+          <div class="eyebrow"><span class="eyebrow-line"></span> Code de démonstration <%= candidate.verification_code %></div>
           <h1><%= candidate.exam %> <span>— Session <%= candidate.session_year %></span></h1>
           <p class="result-subtitle">Candidat : <strong><%= candidate.last_name %> <%= candidate.first_name %></strong> · N° PV <strong><%= candidate.pv_number %></strong></p>
         </div>
@@ -30,7 +30,7 @@
         <div class="result-main">
           <!-- État civil certifié -->
           <section class="result-card identity-card">
-            <div class="section-title"><span class="section-number">01</span><h2>Données d’état civil certifiées</h2></div>
+            <div class="section-title"><span class="section-number">01</span><h2>Informations fictives du candidat</h2></div>
             <div class="identity-grid">
               <div><small>Nom et prénoms</small><strong><%= candidate.last_name %> <%= candidate.first_name %></strong></div>
               <div><small>Date et lieu de naissance</small><strong><%= candidate.birth_date %> · <%= candidate.birth_place %></strong></div>
@@ -39,7 +39,7 @@
             </div>
           </section>
 
-          <!-- Détails examen certifiés -->
+          <!-- Détails fictifs de l'examen -->
           <section class="result-card">
             <div class="section-title"><span class="section-number">02</span><h2>Informations de délibération</h2></div>
             <div class="composition-grid">
@@ -50,9 +50,9 @@
             </div>
           </section>
 
-          <!-- Notes certifiées -->
+          <!-- Notes fictives -->
           <section class="result-card grades-card">
-            <div class="section-title"><span class="section-number">03</span><h2>Notes certifiées enregistrées</h2></div>
+            <div class="section-title"><span class="section-number">03</span><h2>Notes de démonstration</h2></div>
             <div class="table-wrap">
               <table>
                 <thead>
@@ -80,7 +80,7 @@
 
         <aside class="result-aside">
           <div class="score-card">
-            <span class="score-label">Moyenne officielle</span>
+            <span class="score-label">Moyenne de démonstration</span>
             <div class="score"><%= formatScore(candidate.average) %><small>/20</small></div>
             <div class="score-divider"></div>
             <span class="mention-label">Mention</span>
@@ -91,10 +91,10 @@
           </div>
 
           <div class="notice-card">
-            <strong>Relevé numérique officiel</strong>
-            <p>Téléchargez la version PDF originale certifiée avec QR code.</p>
+            <strong>Relevé fictif</strong>
+            <p>Le PDF téléchargé est un exemple de démonstration, sans valeur officielle.</p>
             <a href="/resultats/<%= candidate.pv_number %>/pdf" class="primary-button small-button" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">
-              Télécharger le PDF officiel <span>↓</span>
+              Télécharger le PDF de démo <span>↓</span>
             </a>
           </div>
         </aside>
@@ -106,17 +106,17 @@
         <div class="banner-icon">✕</div>
         <div>
           <h2>Document Non Reconnu ou Code Invalide</h2>
-          <p>Le code fourni (<code><%= queryCode || 'Inconnu' %></code>) ne correspond à aucun résultat certifié dans la base de données de la DGEC.</p>
+          <p>Le code fourni (<code><%= queryCode || 'Inconnu' %></code>) ne correspond à aucun exemple fictif de la base de démonstration.</p>
         </div>
       </div>
 
       <div class="search-card" style="max-width: 500px; margin: 40px auto;">
         <h2>Vérifier un autre document</h2>
-        <p>Saisissez le code de vérification figurant au bas du relevé (Ex: <code>BF-2026-BAC-0837-7D9A</code>) :</p>
+        <p>Saisissez le code de démonstration figurant au bas du relevé :</p>
         <form action="/verifier" method="get">
           <label for="code">Code de vérification</label>
-          <input type="text" id="code" name="code" placeholder="Ex. BF-2026-BAC-0837-7D9A" required uppercase>
-          <button type="submit" class="primary-button" style="margin-top: 15px;">Vérifier ce document <span>→</span></button>
+          <input type="text" id="code" name="code" placeholder="BF-…" required>
+          <button type="submit" class="primary-button" style="margin-top: 15px;">Vérifier l'exemple <span>→</span></button>
         </form>
       </div>
     <% } %>
